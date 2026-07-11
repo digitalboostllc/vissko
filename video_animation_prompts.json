@@ -1,0 +1,26 @@
+[
+  {
+    "base_image": "vissko-fan-hero.png",
+    "filename": "video_hero.mp4",
+    "description": "Hero Product Spin",
+    "prompt": "Subtle, cinematic slow-motion product video. The white portable neck fan floats gently in mid-air. The camera slowly pushes in (slight zoom) while panning slightly to the right. The white background remains pure. CRITICAL: The product must remain 100% solid and rigid. Do not morph, melt, or deform the plastic shape or the LED screen."
+  },
+  {
+    "base_image": "lifestyle-office.png",
+    "filename": "video_office.mp4",
+    "description": "Office Lifestyle Animation",
+    "prompt": "Cinematic slow-motion 8s video. The chic French woman at the desk smiles very subtly and blinks. The natural sunlight from the window shifts slightly, creating a beautiful moving reflection on her hair. Her breathing is relaxed. CRITICAL: The white Vissko neck fan around her neck must stay perfectly rigid, maintaining its exact shape and solid matte texture without warping."
+  },
+  {
+    "base_image": "lifestyle-metro.png",
+    "filename": "video_metro.mp4",
+    "description": "Metro Commute Animation",
+    "prompt": "Cinematic slow-motion 8s video. The stylish young French man stands in the metro. The subway car vibrates very slightly, and the blurred background streaks subtly as if the train is moving. The man looks incredibly cool and blinks slowly. CRITICAL: The white portable neck fan around his neck must remain perfectly solid and structurally intact. Do not let the fan mutate or blend into his shirt."
+  },
+  {
+    "base_image": "lifestyle-beach.png",
+    "filename": "video_beach.mp4",
+    "description": "Beach Relaxation Animation",
+    "prompt": "Cinematic slow-motion 8s video. The beautiful French woman relaxes on the sun lounger. A gentle summer breeze moves the brim of her sun hat very slightly. The crystal clear blue Mediterranean water in the background ripples softly. She smiles. CRITICAL: The white neck fan around her neck must remain absolutely solid, rigid, and geometrically perfect. No melting or morphing of the plastic."
+  }
+]

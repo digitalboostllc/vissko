@@ -1,0 +1,17 @@
+[
+  {
+    "filename": "video_crowded_street_1.mp4",
+    "description": "Crowded Summer Street Video - Woman",
+    "prompt": "Cinematic 8-second vertical video (9:16). Subtle slow-motion tracking shot. The stylish French woman walks forward confidently. Her hair blows very slightly in a gentle breeze. The blurred crowd in the background is bustling, with people wiping sweat and fanning themselves. The camera moves smoothly. CRITICAL: The white Vissko neck fan remains perfectly solid, rigid, and geometrically consistent around her neck with no warping or morphing."
+  },
+  {
+    "filename": "video_crowded_street_2.mp4",
+    "description": "Crowded Tourist Spot Video - Man",
+    "prompt": "Cinematic 8-second vertical video (9:16). The fashionable young man walks through the dense tourist square. He looks relaxed and smiles slightly. The heavy crowd behind him is moving sluggishly in the heatwave, some people fanning their faces. Slow, stabilizing gimbal movement. CRITICAL: The white portable neck fan stays perfectly locked to his neck, maintaining its smooth matte plastic texture and rigid shape without deforming."
+  },
+  {
+    "filename": "video_crowded_festival.mp4",
+    "description": "Crowded Outdoor Festival Video",
+    "prompt": "Cinematic 8-second vertical video (9:16). The smiling woman at the summer festival sways very gently to the music. The massive crowd behind her shifts slightly under the harsh sun. Her hands drop smoothly from the neckband. Beautiful lens flares from the bright sun. CRITICAL: The white neck fan retains its exact rigid shape, volume, and clean lines without melting or shifting structure."
+  }
+]

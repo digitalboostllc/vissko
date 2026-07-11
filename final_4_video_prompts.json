@@ -1,0 +1,26 @@
+[
+  {
+    "base_image": "first_frame_outdoor.png",
+    "filename": "video_outdoor_walk.mp4",
+    "description": "Video: Outdoor Walk (Adjusting Neckband)",
+    "prompt": "Cinematic slow-motion 8s video (9:16). The stylish young French woman stands on the sunny Parisian street. Her hand gently moves to adjust the flexible silicone neckband. She blinks and smiles warmly. A very subtle breeze moves her hair. The bright sunlight creates a beautiful lens flare. CRITICAL: The white Vissko neck fan must remain perfectly solid and rigid around her neck without mutating. The hands must move naturally without blending into the device."
+  },
+  {
+    "base_image": "first_frame_commute.png",
+    "filename": "video_commute_button.mp4",
+    "description": "Video: Metro Commute (Pressing Button)",
+    "prompt": "Cinematic slow-motion 8s video (9:16). The fashionable person stands inside the brightly lit metro train. Their finger presses the subtle side button on the fan. The train car vibrates very slightly in the background. They blink slowly, looking incredibly cool. CRITICAL: The white neck fan stays perfectly solid, maintaining its matte texture and crisp shape. Do not deform or melt the plastic."
+  },
+  {
+    "base_image": "first_frame_crowded_street_1.png",
+    "filename": "video_crowded_street_1.mp4",
+    "description": "Video: Crowded Summer Street",
+    "prompt": "Cinematic 8-second vertical video (9:16). Subtle slow-motion tracking shot. The stylish French woman walks forward confidently. Her hair blows very slightly in a gentle breeze. The blurred crowd in the background is bustling, with people wiping sweat and fanning themselves. The camera moves smoothly. CRITICAL: The white Vissko neck fan remains perfectly solid, rigid, and geometrically consistent around her neck with no warping or morphing."
+  },
+  {
+    "base_image": "first_frame_crowded_festival.png",
+    "filename": "video_crowded_festival.mp4",
+    "description": "Video: Crowded Outdoor Festival",
+    "prompt": "Cinematic 8-second vertical video (9:16). The smiling woman at the summer festival sways very gently to the music. The massive crowd behind her shifts slightly under the harsh sun. Her hands drop smoothly from the neckband. Beautiful lens flares from the bright sun. CRITICAL: The white neck fan retains its exact rigid shape, volume, and clean lines without melting or shifting structure."
+  }
+]

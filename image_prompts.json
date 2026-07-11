@@ -1,0 +1,32 @@
+[
+  {
+    "filename": "vissko-fan-hero.png",
+    "description": "Main product hero image",
+    "prompt": "Professional studio product photography of a sleek, modern, premium white neck-hanging portable mini fan. Minimalist Apple-style aesthetic. The fan has a clean, smooth matte white finish with a small, elegant digital LED display showing '85%'. Soft studio lighting, bright white background, highly detailed, 8k resolution, photorealistic."
+  },
+  {
+    "filename": "vissko-fan-gallery.png",
+    "description": "360 Gallery image with no background",
+    "prompt": "High-end 3D render style product photography of a minimalist white portable neck fan floating in the air. The fan features a sleek safety grill and a small digital screen. Pure white background, ultra-clean Dyson-like industrial design, soft diffused shadows, high contrast, 8k, extremely detailed."
+  },
+  {
+    "filename": "vissko-led-display.png",
+    "description": "Close up of the LED display",
+    "prompt": "Extreme macro photography of a modern white portable fan's digital LED screen. The screen is circular and glows with crisp white digital numbers reading '85%'. The surrounding plastic is premium matte white. Dark, moody background with subtle blue and orange neon light reflections on the glossy screen surface, cyberpunk but clean and premium, 8k, photorealistic."
+  },
+  {
+    "filename": "lifestyle-office.png",
+    "description": "Lifestyle shot in a French office",
+    "prompt": "Candid lifestyle photography of an elegant French woman in her 30s working at a modern, bright Parisian office desk. She is wearing a chic white blouse and has a sleek, modern white portable neck fan resting comfortably around her neck. She looks focused and refreshed. Soft natural light coming from a large window overlooking Haussmannian buildings. Cinematic, shallow depth of field, photorealistic, Vogue editorial style."
+  },
+  {
+    "filename": "lifestyle-metro.png",
+    "description": "Lifestyle shot in the Paris metro",
+    "prompt": "Candid lifestyle photography of a stylish young French man in his 20s standing inside a crowded Paris metro car during a hot summer day. He is wearing a sleek white portable neck fan around his neck and looks completely cool and relaxed while others look hot. Authentic Parisian commute, blurred background with subway poles, cinematic lighting, 35mm lens, photorealistic."
+  },
+  {
+    "filename": "lifestyle-beach.png",
+    "description": "Lifestyle shot at the beach in South of France",
+    "prompt": "Candid lifestyle photography of a beautiful French woman in her 40s relaxing on a sun lounger at a luxurious beach club in the French Riviera (Côte d'Azur). She is wearing a stylish sun hat, sunglasses, and a sleek white portable neck fan around her neck. Crystal clear blue Mediterranean water in the background. Bright summer sunlight, vibrant colors, highly detailed, photorealistic, premium travel aesthetic."
+  }
+]

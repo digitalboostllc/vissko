@@ -1,0 +1,22 @@
+[
+  {
+    "filename": "first_frame_unboxing.png",
+    "description": "First frame for Unboxing video",
+    "prompt": "Extreme close up photography of a pair of hands holding the Vissko portable neck fan. The hands are holding the ends of the flexible silicone neckband, demonstrating how it bends open to fit around the neck. The main body of the fan is pristine white with a small glowing LED screen showing '100%'. Pure Apple-style studio lighting, shallow depth of field, 8k resolution, photorealistic."
+  },
+  {
+    "filename": "first_frame_outdoor.png",
+    "description": "First frame for Outdoor Walk video",
+    "prompt": "Candid lifestyle photography of a stylish young French woman standing on a sunny Parisian street in summer. She has the Vissko white portable neck fan resting comfortably around her neck. She is reaching up with one hand to gently adjust the flexible neckband. She is smiling. Shot on 35mm lens, natural bright sunlight, vibrant colors, lifestyle aesthetic, 8k, highly detailed."
+  },
+  {
+    "filename": "first_frame_office.png",
+    "description": "First frame for Office video",
+    "prompt": "Candid lifestyle photography of a handsome man in a smart-casual white shirt sitting at a modern bright office desk. He is holding the Vissko white neck fan in his hands, pulling the flexible silicone band open, just about to place it around his neck. Soft diffused window light, professional corporate environment, shallow depth of field, 8k resolution, cinematic lighting."
+  },
+  {
+    "filename": "first_frame_commute.png",
+    "description": "First frame for Commute video",
+    "prompt": "Candid lifestyle photography of a fashionable person standing inside a slightly crowded, brightly lit modern metro train. They are wearing the Vissko white neck fan around their neck, and their fingers are resting on the subtle side button to adjust the speed. Dynamic composition, cinematic lighting, modern urban aesthetic, 8k resolution, highly detailed."
+  }
+]

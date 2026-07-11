@@ -1,0 +1,151 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import Stripe from 'stripe';
+import { Resend } from 'resend';
+import { saveOrder, getOrder } from './db.js';
+
+dotenv.config();
+
+// Ensure you have STRIPE_SECRET_KEY in your .env file
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
+  apiVersion: '2025-01-27.acacia',
+});
+
+const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder');
+
+const app = express();
+app.use(cors());
+app.use(express.static('public'));
+
+// IMPORTANT: Webhook must use express.raw before express.json()
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+app.post('/webhook', express.raw({type: 'application/json'}), async (request, response) => {
+  const sig = request.headers['stripe-signature'];
+  let event;
+
+  try {
+    if (endpointSecret) {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } else {
+      // For local testing without a webhook secret
+      event = JSON.parse(request.body.toString());
+    }
+  } catch (err) {
+    console.log(`⚠️  Webhook Error: ${err.message}`);
+    return response.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the checkout.session.completed event
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const orderId = session.id;
+    const customerEmail = session.customer_details?.email;
+
+    if (customerEmail) {
+      // 1. Save to Database
+      try {
+        saveOrder(orderId, customerEmail);
+        console.log(`✅ Order ${orderId} saved to database for ${customerEmail}`);
+      } catch (err) {
+        console.error('Error saving order to DB:', err);
+      }
+
+      // 2. Send Order Confirmation Email via Resend
+      try {
+        await resend.emails.send({
+          from: 'Vissko <orders@vissko.com>', // Requires verified domain in Resend
+          to: customerEmail,
+          subject: 'Confirmation de votre commande Vissko',
+          html: `
+            <div style="font-family: sans-serif; max-w-xl; margin: auto; padding: 20px;">
+              <h2>Merci pour votre commande !</h2>
+              <p>Votre paiement a bien été reçu. Nous préparons actuellement votre commande.</p>
+              <p><strong>Numéro de commande :</strong> ${orderId}</p>
+              <p>Vous pouvez suivre l'avancée de votre livraison (10-15 jours ouvrés) directement sur notre site.</p>
+              <br/>
+              <p>L'équipe Vissko</p>
+            </div>
+          `
+        });
+        console.log(`📧 Order confirmation email sent to ${customerEmail}`);
+      } catch (err) {
+        console.error('Error sending email via Resend:', err);
+      }
+    }
+  }
+
+  response.send();
+});
+
+// For all other routes, parse JSON bodies
+app.use(express.json());
+
+const DOMAIN = process.env.DOMAIN || 'http://localhost:5173';
+
+app.post('/create-checkout-session', async (req, res) => {
+  try {
+    const quantity = parseInt(req.body.quantity, 10) || 1;
+
+    const session = await stripe.checkout.sessions.create({
+      ui_mode: 'embedded',
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'Vissko Ventilateur Portable 1800mAh',
+              description: 'Ventilateur multifonction tour de cou, 5 vitesses, écran LED',
+              images: [`${DOMAIN}/assets/vissko-fan-hero.png`],
+            },
+            unit_amount: 3999, // 39.99€
+          },
+          quantity: quantity,
+        },
+      ],
+      mode: 'payment',
+      return_url: `${DOMAIN}/return?session_id={CHECKOUT_SESSION_ID}`,
+    });
+
+    res.send({ clientSecret: session.client_secret });
+  } catch (error) {
+    console.error('Error creating Stripe session:', error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Tracking API Endpoint
+app.get('/api/tracking/:orderId', (req, res) => {
+  const { orderId } = req.params;
+  const { email } = req.query;
+  
+  if (!orderId || !email) {
+    return res.status(400).send({ error: 'Order ID and Email are required' });
+  }
+
+  const order = getOrder(orderId, email);
+
+  if (order) {
+    res.send(order);
+  } else {
+    res.status(404).send({ error: 'Order not found' });
+  }
+});
+
+app.get('/session-status', async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+
+    res.send({
+      status: session.status,
+      customer_email: session.customer_details?.email,
+    });
+  } catch (error) {
+    console.error('Error fetching session:', error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 4242;
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
