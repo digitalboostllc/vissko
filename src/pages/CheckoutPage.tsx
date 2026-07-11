@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js'
 import { ChevronLeft, ShieldCheck, Minus, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_placeholder')
 

@@ -31,7 +31,7 @@ export const TrackingPage = ({ onBack }: TrackingPageProps) => {
       if (!res.ok) {
         throw new Error("Commande introuvable avec ces identifiants.")
       }
-      const data = await res.json()
+      await res.json()
       // You can use data.status to dynamically update the timeline here later
       setIsTracking(true)
     } catch (err: any) {
