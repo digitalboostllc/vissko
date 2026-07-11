@@ -11,4 +11,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:4242',
+      '/create-checkout-session': 'http://localhost:4242',
+      '/session-status': 'http://localhost:4242',
+      '/webhook': 'http://localhost:4242'
+    }
+  }
 })

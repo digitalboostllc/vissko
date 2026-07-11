@@ -46,7 +46,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
     if (customerEmail) {
       // 1. Save to Database
       try {
-        saveOrder(orderId, customerEmail);
+        await saveOrder(orderId, customerEmail);
         console.log(`✅ Order ${orderId} saved to database for ${customerEmail}`);
       } catch (err) {
         console.error('Error saving order to DB:', err);
@@ -116,7 +116,7 @@ app.post('/create-checkout-session', async (req, res) => {
 });
 
 // Tracking API Endpoint
-app.get('/api/tracking/:orderId', (req, res) => {
+app.get('/api/tracking/:orderId', async (req, res) => {
   const { orderId } = req.params;
   const { email } = req.query;
   
@@ -124,12 +124,17 @@ app.get('/api/tracking/:orderId', (req, res) => {
     return res.status(400).send({ error: 'Order ID and Email are required' });
   }
 
-  const order = getOrder(orderId, email);
+  try {
+    const order = await getOrder(orderId, email);
 
-  if (order) {
-    res.send(order);
-  } else {
-    res.status(404).send({ error: 'Order not found' });
+    if (order) {
+      res.send(order);
+    } else {
+      res.status(404).send({ error: 'Order not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching order from Turso:', error);
+    res.status(500).send({ error: 'Database error' });
   }
 });
 
@@ -147,5 +152,9 @@ app.get('/session-status', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 4242;
-app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4242;
+  app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+}
+
+export default app;

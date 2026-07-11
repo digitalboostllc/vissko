@@ -27,7 +27,7 @@ export const TrackingPage = ({ onBack }: TrackingPageProps) => {
     setErrorMsg('')
     
     try {
-      const res = await fetch(`http://localhost:4242/api/tracking/${encodeURIComponent(orderNumber)}?email=${encodeURIComponent(email)}`)
+      const res = await fetch(`/api/tracking/${encodeURIComponent(orderNumber)}?email=${encodeURIComponent(email)}`)
       if (!res.ok) {
         throw new Error("Commande introuvable avec ces identifiants.")
       }

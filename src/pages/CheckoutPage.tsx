@@ -21,7 +21,7 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
     setClientSecret(null) // Unmount old iframe while loading
 
     try {
-      const res = await fetch('http://localhost:4242/create-checkout-session', {
+      const res = await fetch('/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity: qty })

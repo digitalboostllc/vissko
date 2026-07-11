@@ -29,7 +29,7 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
 
     setOrderId(sessionId)
 
-    fetch(`http://localhost:4242/session-status?session_id=${sessionId}`)
+    fetch(`/session-status?session_id=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
         setStatus(data.status)
