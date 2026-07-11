@@ -82,11 +82,11 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
 // For all other routes, parse JSON bodies
 app.use(express.json());
 
-const DOMAIN = process.env.DOMAIN || 'http://localhost:5173';
-
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const quantity = parseInt(req.body.quantity, 10) || 1;
+    // Dynamically get the domain so it works on Vercel without env variables
+    const currentDomain = req.headers.origin || process.env.DOMAIN || 'http://localhost:5173';
 
     const session = await stripe.checkout.sessions.create({
       ui_mode: 'embedded',
@@ -97,7 +97,7 @@ app.post('/create-checkout-session', async (req, res) => {
             product_data: {
               name: 'Vissko Ventilateur Portable 1800mAh',
               description: 'Ventilateur multifonction tour de cou, 5 vitesses, écran LED',
-              images: [`${DOMAIN}/assets/vissko-fan-hero.png`],
+              images: [`${currentDomain}/assets/vissko-fan-hero.png`],
             },
             unit_amount: 3999, // 39.99€
           },
@@ -105,7 +105,7 @@ app.post('/create-checkout-session', async (req, res) => {
         },
       ],
       mode: 'payment',
-      return_url: `${DOMAIN}/return?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `${currentDomain}/return?session_id={CHECKOUT_SESSION_ID}`,
     });
 
     res.send({ clientSecret: session.client_secret });
