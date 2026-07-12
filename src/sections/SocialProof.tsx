@@ -21,7 +21,7 @@ const testimonials = [
     name: "Claire L.",
     city: "Marseille",
     text: "Parfait pour la plage. La puissance au niveau 5 est impressionnante pour un si petit appareil. Je recommande à 100%.",
-    rating: 4,
+    rating: 5,
     date: "Il y a 1 semaine"
   }
 ]

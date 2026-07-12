@@ -64,9 +64,9 @@ export const Hero = ({ onBuyClick }: HeroProps) => {
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 w-full">
               <div className="flex flex-col">
-                <span className="text-4xl font-bold text-foreground">39.99€</span>
+                <span className="text-4xl font-bold text-foreground">89.00€</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-lg text-muted-foreground line-through decoration-destructive/50 decoration-2">59.99€</span>
+                  <span className="text-lg text-muted-foreground line-through decoration-destructive/50 decoration-2">129.00€</span>
                   <Badge className="bg-destructive text-white rounded-md text-xs font-bold">-33%</Badge>
                 </div>
               </div>

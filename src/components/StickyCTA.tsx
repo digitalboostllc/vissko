@@ -39,7 +39,7 @@ export const StickyCTA = ({ onBuyClick }: StickyCTAProps) => {
               Offre Flash
             </span>
             <span className="text-xl font-black text-black leading-none">
-              39.99€
+              89.00€
             </span>
           </div>
           <Button

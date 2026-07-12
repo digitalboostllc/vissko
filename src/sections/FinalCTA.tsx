@@ -27,7 +27,7 @@ export const FinalCTA = ({ onBuyClick }: FinalCTAProps) => {
                 <div className="text-3xl font-bold mb-2">Offre de lancement</div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg text-white/70 line-through">79.99€</span>
-                  <span className="text-5xl font-black text-white">39.99€</span>
+                  <span className="text-5xl font-black text-white">89.00€</span>
                 </div>
               </div>
               

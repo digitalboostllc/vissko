@@ -101,7 +101,7 @@ app.post('/create-checkout-session', async (req, res) => {
               description: 'Ventilateur multifonction tour de cou, 5 vitesses, écran LED',
               images: [`${currentDomain}/assets/vissko-fan-hero.png`],
             },
-            unit_amount: 3999, // 39.99€
+            unit_amount: 8900, // 89.00€
           },
           quantity: quantity,
         },

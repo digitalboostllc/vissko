@@ -110,7 +110,7 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
               <p className="text-sm text-zinc-500">Blanc Minimaliste</p>
             </div>
             <div className="font-medium text-right">
-              <div>39.99€</div>
+              <div>89.00€</div>
             </div>
           </div>
 
@@ -159,7 +159,7 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
           {/* Total */}
           <div className="flex justify-between items-center mb-8">
             <span className="text-lg font-bold">Total</span>
-            <span className="text-2xl font-black">{(39.99 * quantity).toFixed(2)}€</span>
+            <span className="text-2xl font-black">{(89.00 * quantity).toFixed(2)}€</span>
           </div>
 
           {/* Trust Badges */}
