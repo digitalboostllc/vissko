@@ -101,7 +101,7 @@ export const SocialProof = () => {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.7}
-            onDragEnd={(e, { offset, velocity }) => {
+            onDragEnd={(_, { offset, velocity }) => {
               if (Math.abs(offset.x) > 100 || Math.abs(velocity.x) > 500) {
                 setRecentOrder(null);
               }
