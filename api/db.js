@@ -10,10 +10,11 @@ const client = createClient({
 // Table 'orders' must be created manually or via init scripts.
 // The schema is: id (TEXT), email (TEXT), status (TEXT), created_at (DATETIME)
 
-export const saveOrder = async (id, email) => {
+export const saveOrder = async (id, email, customerName = null, phone = null, shippingAddress = null) => {
+  const addressJson = shippingAddress ? JSON.stringify(shippingAddress) : null;
   return await client.execute({
-    sql: 'INSERT OR IGNORE INTO orders (id, email, status) VALUES (?, ?, ?)',
-    args: [id, email, 'confirmed']
+    sql: 'INSERT OR IGNORE INTO orders (id, email, customer_name, phone, shipping_address, status) VALUES (?, ?, ?, ?, ?, ?)',
+    args: [id, email, customerName, phone, addressJson, 'confirmed']
   });
 };
 

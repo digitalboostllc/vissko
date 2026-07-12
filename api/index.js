@@ -42,13 +42,16 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
     const session = event.data.object;
     const orderId = session.id;
     const customerEmail = session.customer_details?.email;
+    const customerName = session.customer_details?.name || session.shipping_details?.name || null;
+    const phone = session.customer_details?.phone || null;
+    const shippingAddress = session.shipping_details?.address || null;
 
     if (customerEmail) {
       const shortId = 'VSK-' + orderId.slice(-8).toUpperCase();
 
       // 1. Save to Database
       try {
-        await saveOrder(shortId, customerEmail);
+        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress);
         console.log(`✅ Order ${shortId} saved to database for ${customerEmail}`);
       } catch (err) {
         console.error('Error saving order to DB:', err);
@@ -152,9 +155,12 @@ app.get('/session-status', async (req, res) => {
     const shortId = 'VSK-' + session.id.slice(-8).toUpperCase();
 
     if (session.status === 'complete' && session.customer_details?.email) {
+      const customerName = session.customer_details?.name || session.shipping_details?.name || null;
+      const phone = session.customer_details?.phone || null;
+      const shippingAddress = session.shipping_details?.address || null;
       // Bulletproof fallback: save order immediately if webhook hasn't fired yet
       try {
-        await saveOrder(shortId, session.customer_details.email);
+        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress);
         console.log(`✅ Order ${shortId} proactively saved in session-status`);
       } catch (err) {
         console.error('Error saving order proactively:', err);
