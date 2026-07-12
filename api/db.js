@@ -7,15 +7,8 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN || '',
 });
 
-// Initialize database
-client.execute(`
-  CREATE TABLE IF NOT EXISTS orders (
-    id TEXT PRIMARY KEY,
-    email TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'confirmed',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`).catch(console.error);
+// Table 'orders' must be created manually or via init scripts.
+// The schema is: id (TEXT), email (TEXT), status (TEXT), created_at (DATETIME)
 
 export const saveOrder = async (id, email) => {
   return await client.execute({
