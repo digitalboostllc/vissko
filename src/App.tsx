@@ -8,6 +8,7 @@ import { SocialProof } from '@/sections/SocialProof'
 import { FAQ } from '@/sections/FAQ'
 import { FinalCTA } from '@/sections/FinalCTA'
 import { Guarantee } from '@/sections/Guarantee'
+import { Lifestyle } from '@/sections/Lifestyle'
 import { ComparisonTable } from '@/sections/ComparisonTable'
 import { AsSeenOn } from '@/sections/AsSeenOn'
 import { StickyCTA } from '@/components/StickyCTA'
@@ -82,6 +83,7 @@ function App() {
           <ActionVideos />
           <AnimatedGallery />
           <ComparisonTable />
+          <Lifestyle />
           <Guarantee />
           <SocialProof />
           <FAQ />
