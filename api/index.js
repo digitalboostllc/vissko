@@ -107,6 +107,12 @@ app.post('/create-checkout-session', async (req, res) => {
         },
       ],
       mode: 'payment',
+      shipping_address_collection: {
+        allowed_countries: ['FR', 'BE', 'CH', 'LU', 'MC', 'CA', 'US'],
+      },
+      phone_number_collection: {
+        enabled: true,
+      },
       return_url: `${currentDomain}/return?session_id={CHECKOUT_SESSION_ID}`,
     });
 
