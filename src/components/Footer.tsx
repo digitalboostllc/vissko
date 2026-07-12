@@ -23,8 +23,16 @@ export const Footer = ({ onNavigate }: FooterProps) => {
           </div>
         </div>
         
-        <div className="mt-8 text-center md:text-left text-xs text-zinc-600">
-          &copy; {new Date().getFullYear()} Vissko. Tous droits réservés.
+        <div className="mt-8 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
+          <div className="text-center md:text-left text-sm text-zinc-500">
+            <p className="font-semibold text-zinc-300 mb-2">À propos de nous</p>
+            <p>Vissko LLC</p>
+            <p>2443 Sierra Nevada Road</p>
+            <p>Mammoth Lakes, CA 93546, USA</p>
+          </div>
+          <div className="text-center md:text-right text-xs text-zinc-600">
+            &copy; {new Date().getFullYear()} Vissko. Tous droits réservés.
+          </div>
         </div>
       </div>
     </footer>
