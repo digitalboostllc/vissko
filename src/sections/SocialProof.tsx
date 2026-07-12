@@ -97,7 +97,7 @@ export const SocialProof = () => {
           <motion.div
             initial={{ opacity: 0, y: 50, x: 0 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, x: 300, scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.7}
