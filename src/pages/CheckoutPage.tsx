@@ -102,7 +102,7 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
                   className="w-full h-full object-contain mix-blend-multiply"
                 />
               </div>
-              <span className="absolute -top-2 -right-2 bg-zinc-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full z-10 shadow-sm">{quantity}</span>
+              <span className="absolute -top-2 -right-2 bg-zinc-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full z-10">{quantity}</span>
             </div>
             
             <div className="flex-grow">

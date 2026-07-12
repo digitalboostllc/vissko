@@ -30,7 +30,7 @@ export const Header = ({ onBuyClick }: HeaderProps) => {
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${
           (isScrolled || isMobileMenuOpen)
-            ? 'bg-foreground/95 backdrop-blur-md py-3 border-border shadow-lg' 
+            ? 'bg-foreground/95 backdrop-blur-md py-3 border-border' 
             : 'bg-background py-5 border-transparent'
         }`}
       >

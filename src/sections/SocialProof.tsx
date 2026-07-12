@@ -98,7 +98,7 @@ export const SocialProof = () => {
             initial={{ opacity: 0, y: 50, x: 0 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-28 md:bottom-6 left-4 right-4 md:right-auto md:left-6 z-50 bg-background shadow-xl border border-border rounded-xl p-4 flex items-center gap-4 md:max-w-sm"
+            className="fixed bottom-28 md:bottom-6 left-4 right-4 md:right-auto md:left-6 z-50 bg-background border border-border rounded-xl p-4 flex items-center gap-4 md:max-w-sm"
           >
             <div className="w-12 h-12 bg-secondary rounded-lg overflow-hidden shrink-0">
               <img src="/assets/vissko-fan-hero.png" alt="Produit" className="w-full h-full object-cover" />

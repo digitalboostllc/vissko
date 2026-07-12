@@ -79,7 +79,7 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-zinc-200 w-full max-w-xl text-center"
+          className="bg-white p-8 md:p-12 rounded-3xl border border-zinc-200 w-full max-w-xl text-center"
         >
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center relative">

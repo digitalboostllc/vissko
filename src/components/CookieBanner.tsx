@@ -30,7 +30,7 @@ export const CookieBanner = () => {
           className="fixed bottom-0 left-0 right-0 z-[100] p-4 md:p-6"
         >
           <div className="container mx-auto max-w-4xl">
-            <div className="bg-zinc-900 border border-zinc-800 text-white rounded-2xl shadow-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-zinc-900 border border-zinc-800 text-white rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-start gap-4">
                 <div className="bg-zinc-800 p-3 rounded-full hidden md:block">
                   <Cookie className="w-6 h-6 text-zinc-300" />

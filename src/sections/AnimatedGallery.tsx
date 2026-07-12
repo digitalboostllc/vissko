@@ -45,12 +45,12 @@ export const AnimatedGallery = () => {
         />
         
         {/* Callouts */}
-        <div className="absolute top-1/4 right-[15%] lg:right-[25%] bg-white/95 backdrop-blur-md shadow-2xl px-4 py-2 rounded-full hidden md:flex items-center gap-2 animate-bounce border border-black/10">
-          <div className="w-2 h-2 rounded-full bg-black" />
-          <span className="text-sm font-bold text-black">Grille de sécurité</span>
+        <div className="absolute top-1/4 right-[15%] lg:right-[25%] bg-white/95 backdrop-blur-md px-4 py-2 rounded-full hidden md:flex items-center gap-2 animate-bounce border border-black/10">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-semibold whitespace-nowrap">Conception Premium</span>
         </div>
-        
-        <div className="absolute bottom-1/4 left-[15%] lg:left-[25%] bg-white/95 backdrop-blur-md shadow-2xl px-4 py-2 rounded-full hidden md:flex items-center gap-2 border border-black/10">
+
+        <div className="absolute bottom-1/4 left-[15%] lg:left-[25%] bg-white/95 backdrop-blur-md px-4 py-2 rounded-full hidden md:flex items-center gap-2 border border-black/10">
           <div className="w-2 h-2 rounded-full bg-black" />
           <span className="text-sm font-bold text-black">Port USB-C</span>
         </div>
