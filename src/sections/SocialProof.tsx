@@ -97,13 +97,22 @@ export const SocialProof = () => {
           <motion.div
             initial={{ opacity: 0, y: 50, x: 0 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-28 md:bottom-6 left-4 right-4 md:right-auto md:left-6 z-50 bg-background border border-border rounded-xl p-4 flex items-center gap-4 md:max-w-sm"
+            exit={{ opacity: 0, x: 300, scale: 0.9 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.7}
+            onDragEnd={(e, { offset, velocity }) => {
+              if (Math.abs(offset.x) > 100 || Math.abs(velocity.x) > 500) {
+                setRecentOrder(null);
+              }
+            }}
+            whileDrag={{ scale: 0.95, cursor: "grabbing" }}
+            className="fixed bottom-28 md:bottom-6 left-4 right-4 md:right-auto md:left-6 z-50 bg-background border border-border rounded-xl p-4 flex items-center gap-4 md:max-w-sm touch-none cursor-grab"
           >
-            <div className="w-12 h-12 bg-secondary rounded-lg overflow-hidden shrink-0">
+            <div className="w-12 h-12 bg-secondary rounded-lg overflow-hidden shrink-0 pointer-events-none">
               <img src="/assets/vissko-fan-hero.png" alt="Produit" className="w-full h-full object-cover" />
             </div>
-            <div>
+            <div className="pointer-events-none">
               <p className="text-sm font-semibold">{recentOrder}</p>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                 <CheckCircle className="w-3 h-3 text-green-500" /> Achat Vérifié
