@@ -23,35 +23,35 @@ export const Header = ({ onBuyClick }: HeaderProps) => {
   return (
     <>
       {/* Top Banner */}
-      <div className="bg-zinc-950 text-white text-xs md:text-sm font-medium py-2 px-4 text-center">
+      <div className="bg-foreground text-background text-xs md:text-sm font-medium py-2 px-4 text-center">
         <span className="opacity-90">Livraison suivie offerte en France (10-15 jours ouvrés).</span>
       </div>
       
       <header
         className={`sticky top-0 z-50 w-full transition-all duration-300 border-b ${
           (isScrolled || isMobileMenuOpen)
-            ? 'bg-zinc-950/95 backdrop-blur-md py-3 border-white/10 shadow-lg' 
-            : 'bg-transparent py-5 border-transparent'
+            ? 'bg-foreground/95 backdrop-blur-md py-3 border-border shadow-lg' 
+            : 'bg-background py-5 border-transparent'
         }`}
       >
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2">
-            <Logo className={`h-6 w-auto transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-white' : 'text-zinc-900 dark:text-white'}`} />
+            <Logo className={`h-6 w-auto transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-background' : 'text-foreground'}`} />
           </a>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}>Caractéristiques</a>
-            <a href="#gallery" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}>Galerie</a>
-            <a href="#reviews" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}>Avis</a>
-            <a href="#faq" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-zinc-400 hover:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'}`}>FAQ</a>
-            <a href="#track" onClick={(e) => { e.preventDefault(); if (typeof (window as any).openTracking === 'function') (window as any).openTracking(); }} className={`text-sm font-semibold transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-white hover:text-zinc-300' : 'text-zinc-900 hover:text-zinc-700 dark:text-white'}`}>Suivre ma commande</a>
+            <a href="#features" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-muted hover:text-background' : 'text-muted-foreground hover:text-foreground'}`}>Caractéristiques</a>
+            <a href="#gallery" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-muted hover:text-background' : 'text-muted-foreground hover:text-foreground'}`}>Galerie</a>
+            <a href="#reviews" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-muted hover:text-background' : 'text-muted-foreground hover:text-foreground'}`}>Avis</a>
+            <a href="#faq" className={`text-sm font-medium transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-muted hover:text-background' : 'text-muted-foreground hover:text-foreground'}`}>FAQ</a>
+            <a href="#track" onClick={(e) => { e.preventDefault(); if (typeof (window as any).openTracking === 'function') (window as any).openTracking(); }} className={`text-sm font-semibold transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-background hover:text-muted' : 'text-foreground hover:text-muted-foreground'}`}>Suivre ma commande</a>
           </nav>
 
           {/* CTA & Trust */}
           <div className="hidden md:flex items-center gap-4">
-            <div className={`hidden lg:flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full transition-colors ${(isScrolled || isMobileMenuOpen) ? 'bg-white/10 text-white' : 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white'}`}>
+            <div className={`hidden lg:flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full transition-colors ${(isScrolled || isMobileMenuOpen) ? 'bg-background/10 text-background' : 'bg-secondary text-foreground'}`}>
               <ShieldCheck className="w-4 h-4" />
               Paiement Sécurisé
             </div>
@@ -59,8 +59,8 @@ export const Header = ({ onBuyClick }: HeaderProps) => {
               onClick={onBuyClick} 
               className={`rounded-full font-semibold px-6 transition-all hover:scale-105 ${
                 (isScrolled || isMobileMenuOpen)
-                  ? 'bg-white text-zinc-950 hover:bg-zinc-200' 
-                  : 'bg-zinc-950 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200'
+                  ? 'bg-background text-foreground hover:bg-muted' 
+                  : 'bg-foreground text-background hover:bg-foreground/90'
               }`}
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
@@ -70,7 +70,7 @@ export const Header = ({ onBuyClick }: HeaderProps) => {
 
           {/* Mobile Menu Toggle */}
           <button 
-            className={`md:hidden transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-white' : 'text-zinc-900 dark:text-white'}`}
+            className={`md:hidden transition-colors ${(isScrolled || isMobileMenuOpen) ? 'text-background' : 'text-foreground'}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X /> : <Menu />}
