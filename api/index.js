@@ -44,10 +44,12 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
     const customerEmail = session.customer_details?.email;
 
     if (customerEmail) {
+      const shortId = 'VSK-' + orderId.slice(-8).toUpperCase();
+
       // 1. Save to Database
       try {
-        await saveOrder(orderId, customerEmail);
-        console.log(`✅ Order ${orderId} saved to database for ${customerEmail}`);
+        await saveOrder(shortId, customerEmail);
+        console.log(`✅ Order ${shortId} saved to database for ${customerEmail}`);
       } catch (err) {
         console.error('Error saving order to DB:', err);
       }
@@ -62,7 +64,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
             <div style="font-family: sans-serif; max-w-xl; margin: auto; padding: 20px;">
               <h2>Merci pour votre commande !</h2>
               <p>Votre paiement a bien été reçu. Nous préparons actuellement votre commande.</p>
-              <p><strong>Numéro de commande :</strong> ${orderId}</p>
+              <p><strong>Numéro de commande :</strong> ${shortId}</p>
               <p>Vous pouvez suivre l'avancée de votre livraison (10-15 jours ouvrés) directement sur notre site.</p>
               <br/>
               <p>L'équipe Vissko</p>
@@ -141,10 +143,22 @@ app.get('/api/tracking/:orderId', async (req, res) => {
 app.get('/session-status', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+    const shortId = 'VSK-' + session.id.slice(-8).toUpperCase();
+
+    if (session.status === 'complete' && session.customer_details?.email) {
+      // Bulletproof fallback: save order immediately if webhook hasn't fired yet
+      try {
+        await saveOrder(shortId, session.customer_details.email);
+        console.log(`✅ Order ${shortId} proactively saved in session-status`);
+      } catch (err) {
+        console.error('Error saving order proactively:', err);
+      }
+    }
 
     res.send({
       status: session.status,
       customer_email: session.customer_details?.email,
+      order_id: shortId
     });
   } catch (error) {
     console.error('Error fetching session:', error);

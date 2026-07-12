@@ -27,13 +27,12 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
       return
     }
 
-    setOrderId(sessionId)
-
     fetch(`/session-status?session_id=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
         setStatus(data.status)
         setCustomerEmail(data.customer_email)
+        setOrderId(data.order_id)
         setIsLoading(false)
         
         // Clean up the URL so it looks nicer
@@ -97,7 +96,7 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
           <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-100 mb-8 text-left space-y-4">
             <div>
               <div className="text-xs text-zinc-500 font-semibold uppercase tracking-wider mb-1">Numéro de commande</div>
-              <div className="font-mono text-sm text-zinc-900 truncate bg-zinc-200/50 p-2 rounded-lg">{orderId}</div>
+              <div className="font-mono text-xl font-bold text-zinc-900">{orderId}</div>
             </div>
             
             <div className="flex items-start gap-3 mt-4 text-sm text-zinc-600 bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
