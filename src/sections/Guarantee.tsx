@@ -36,13 +36,13 @@ export const Guarantee = () => {
               </p>
               
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm font-medium">
-                <div className="bg-white border border-zinc-200 px-4 py-2 rounded-full text-zinc-600 shadow-sm">
+                <div className="bg-white border border-zinc-200 px-4 py-2 rounded-full text-zinc-600">
                   Retours Simplifiés
                 </div>
-                <div className="bg-white border border-zinc-200 px-4 py-2 rounded-full text-zinc-600 shadow-sm">
+                <div className="bg-white border border-zinc-200 px-4 py-2 rounded-full text-zinc-600">
                   Support Client 7j/7
                 </div>
-                <div className="bg-white border border-zinc-200 px-4 py-2 rounded-full text-zinc-600 shadow-sm">
+                <div className="bg-white border border-zinc-200 px-4 py-2 rounded-full text-zinc-600">
                   Paiement Sécurisé
                 </div>
               </div>
