@@ -4,9 +4,6 @@ import { Header } from '@/sections/Header'
 import { Hero } from '@/sections/Hero'
 import { AnimatedGallery } from '@/sections/AnimatedGallery'
 import { ActionVideos } from '@/sections/ActionVideos'
-import { Benefits } from '@/sections/Benefits'
-import { DisplayScreen } from '@/sections/DisplayScreen'
-import { Lifestyle } from '@/sections/Lifestyle'
 import { SocialProof } from '@/sections/SocialProof'
 import { FAQ } from '@/sections/FAQ'
 import { FinalCTA } from '@/sections/FinalCTA'
@@ -85,9 +82,6 @@ function App() {
           <ActionVideos />
           <AnimatedGallery />
           <ComparisonTable />
-          <Benefits />
-          <DisplayScreen />
-          <Lifestyle />
           <Guarantee />
           <SocialProof />
           <FAQ />

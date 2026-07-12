@@ -1,4 +1,4 @@
-import { ShieldCheck, ArrowRight } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export const Guarantee = () => {
