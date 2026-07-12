@@ -10,6 +10,9 @@ import { Lifestyle } from '@/sections/Lifestyle'
 import { SocialProof } from '@/sections/SocialProof'
 import { FAQ } from '@/sections/FAQ'
 import { FinalCTA } from '@/sections/FinalCTA'
+import { Guarantee } from '@/sections/Guarantee'
+import { ComparisonTable } from '@/sections/ComparisonTable'
+import { AsSeenOn } from '@/sections/AsSeenOn'
 import { StickyCTA } from '@/components/StickyCTA'
 import { Footer } from '@/components/Footer'
 import { CookieBanner } from '@/components/CookieBanner'
@@ -78,11 +81,14 @@ function App() {
         <Header onBuyClick={openCheckout} />
         <main className="flex-grow">
           <Hero onBuyClick={openCheckout} />
+          <AsSeenOn />
           <ActionVideos />
           <AnimatedGallery />
+          <ComparisonTable />
           <Benefits />
           <DisplayScreen />
           <Lifestyle />
+          <Guarantee />
           <SocialProof />
           <FAQ />
           <FinalCTA onBuyClick={openCheckout} />
