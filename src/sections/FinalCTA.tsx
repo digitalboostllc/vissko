@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { ShoppingCart, ShieldCheck, CheckCircle2 } from 'lucide-react'
 
 interface FinalCTAProps {
-  onBuyClick?: () => void;
+  onBuyClick?: (qty: number) => void;
 }
 
 export const FinalCTA = ({ onBuyClick }: FinalCTAProps) => {
@@ -32,7 +32,7 @@ export const FinalCTA = ({ onBuyClick }: FinalCTAProps) => {
               </div>
               
               <div className="flex flex-col gap-3 w-full md:w-auto">
-                <Button onClick={onBuyClick} size="lg" className="w-full md:w-auto rounded-full bg-white hover:bg-white/90 text-black font-bold text-xl px-12 py-8 transition-transform hover:scale-105">
+                <Button onClick={() => onBuyClick?.(1)} size="lg" className="w-full md:w-auto rounded-full bg-white hover:bg-white/90 text-black font-bold text-xl px-12 py-8 transition-transform hover:scale-105">
                   <ShoppingCart className="w-6 h-6 mr-3" />
                   Je commande maintenant
                 </Button>

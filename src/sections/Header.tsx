@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 
 interface HeaderProps {
-  onBuyClick?: () => void;
+  onBuyClick?: (qty: number) => void;
 }
 
 export const Header = ({ onBuyClick }: HeaderProps) => {
@@ -56,7 +56,7 @@ export const Header = ({ onBuyClick }: HeaderProps) => {
               Paiement Sécurisé
             </div>
             <Button 
-              onClick={onBuyClick} 
+              onClick={() => onBuyClick?.(1)} 
               className={`rounded-full font-semibold px-6 transition-all hover:scale-105 ${
                 (isScrolled || isMobileMenuOpen)
                   ? 'bg-background text-foreground hover:bg-muted' 
@@ -93,7 +93,7 @@ export const Header = ({ onBuyClick }: HeaderProps) => {
             <a href="#faq" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-semibold">FAQ</a>
             
             <div className="mt-8">
-              <Button onClick={onBuyClick} className="w-full rounded-full bg-white hover:bg-zinc-200 text-zinc-950 font-semibold py-6 text-lg">
+              <Button onClick={() => onBuyClick?.(1)} className="w-full rounded-full bg-white hover:bg-zinc-200 text-zinc-950 font-semibold py-6 text-lg">
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Commander (Offre du jour)
               </Button>
