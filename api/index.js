@@ -64,13 +64,29 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
           to: customerEmail,
           subject: 'Confirmation de votre commande Vissko',
           html: `
-            <div style="font-family: sans-serif; max-w-xl; margin: auto; padding: 20px;">
-              <h2>Merci pour votre commande !</h2>
-              <p>Votre paiement a bien été reçu. Nous préparons actuellement votre commande.</p>
-              <p><strong>Numéro de commande :</strong> ${shortId}</p>
-              <p>Vous pouvez suivre l'avancée de votre livraison (10-15 jours ouvrés) directement sur notre site.</p>
-              <br/>
-              <p>L'équipe Vissko</p>
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-w-xl; margin: auto; padding: 40px 20px; background-color: #ffffff; color: #18181b;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-weight: 900; letter-spacing: -1px; font-size: 28px; margin: 0;">VISSKO</h1>
+              </div>
+              <div style="background-color: #fafafa; border: 1px solid #e4e4e7; border-radius: 24px; padding: 40px 30px; text-align: center;">
+                <h2 style="margin-top: 0; font-size: 24px; font-weight: 800; color: #18181b;">Commande Confirmée</h2>
+                <p style="color: #52525b; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                  Merci pour votre confiance. Votre paiement a bien été reçu et nous préparons actuellement votre ventilateur Vissko pour l'expédition.
+                </p>
+                <div style="background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 20px; margin-bottom: 30px; display: inline-block; text-align: center; min-width: 200px;">
+                  <p style="margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #71717a; font-weight: 600;">Numéro de commande</p>
+                  <p style="margin: 8px 0 0 0; font-size: 20px; font-weight: 800; color: #10b981;">${shortId}</p>
+                </div>
+                <div style="margin-bottom: 30px;">
+                  <img src="https://vissko.us/assets/vissko-fan-hero.png" alt="Vissko Fan" style="max-width: 250px; height: auto; margin: 0 auto; display: block;" />
+                </div>
+                <a href="https://vissko.us/" style="display: inline-block; background-color: #18181b; color: #ffffff; text-decoration: none; font-weight: 600; padding: 16px 32px; border-radius: 9999px; font-size: 16px;">
+                  Suivre ma commande sur le site
+                </a>
+              </div>
+              <p style="text-align: center; color: #a1a1aa; font-size: 12px; margin-top: 40px;">
+                Vissko LLC<br/>2443 Sierra Nevada Road, Mammoth Lakes, CA 93546
+              </p>
             </div>
           `
         });
