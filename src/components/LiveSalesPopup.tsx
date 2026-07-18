@@ -45,16 +45,25 @@ export const LiveSalesPopup = () => {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: 50, x: -20 }}
+          initial={{ opacity: 0, y: 50, x: 0 }}
           animate={{ opacity: 1, y: 0, x: 0 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          className="fixed bottom-6 left-6 z-40 bg-white rounded-2xl shadow-2xl border border-zinc-200 p-4 max-w-[300px] flex items-center gap-4 cursor-pointer hover:bg-zinc-50 transition-colors"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.7}
+          onDragEnd={(_, { offset, velocity }) => {
+            if (Math.abs(offset.x) > 100 || Math.abs(velocity.x) > 500) {
+              setIsVisible(false);
+            }
+          }}
+          whileDrag={{ scale: 0.95, cursor: "grabbing" }}
+          className="fixed bottom-28 md:bottom-6 left-4 right-4 md:right-auto md:left-6 z-50 bg-white rounded-2xl shadow-2xl border border-zinc-200 p-4 md:max-w-[300px] flex items-center gap-4 touch-none cursor-grab hover:bg-zinc-50 transition-colors"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
+          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden pointer-events-none">
             <ShoppingBag className="w-6 h-6 text-emerald-600" />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col pointer-events-none">
             <div className="flex items-center gap-1 mb-1">
               <span className="text-xs font-bold text-emerald-600">Achat Vérifié</span>
               <div className="flex">
