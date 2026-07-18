@@ -170,7 +170,7 @@ function App() {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen bg-background text-foreground flex flex-col font-sans relative pb-32 md:pb-0">
+      <div className="min-h-screen bg-background text-foreground flex flex-col font-sans relative">
         <Header onBuyClick={openCheckout} />
         <main className="flex-grow">
           <Hero onBuyClick={openCheckout} />
