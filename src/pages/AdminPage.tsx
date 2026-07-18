@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, Download, Lock, RefreshCw, LogOut } from 'lucide-react'
+import { Logo } from '@/components/Logo'
 
 interface AdminPageProps {
   onBack: () => void;
@@ -179,7 +180,10 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
             <button onClick={onBack} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 transition-colors rounded hover:bg-zinc-100">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-bold">Vissko Admin</h1>
+            <div className="flex items-center gap-2">
+              <Logo className="h-5 w-auto text-zinc-900" />
+              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest border-l border-zinc-200 pl-2">Admin</span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button 
