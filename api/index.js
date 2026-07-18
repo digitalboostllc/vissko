@@ -60,7 +60,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
       // 2. Send Order Confirmation Email via Resend
       try {
         await resend.emails.send({
-          from: 'Vissko <orders@vissko.com>', // Requires verified domain in Resend
+          from: 'Vissko <orders@vissko.us>', // Requires verified domain in Resend
           to: customerEmail,
           subject: 'Confirmation de votre commande Vissko',
           html: `
