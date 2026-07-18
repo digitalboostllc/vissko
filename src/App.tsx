@@ -31,8 +31,9 @@ function App() {
   const [hasShownExitIntent, setHasShownExitIntent] = useState(false)
   const [checkoutQty, setCheckoutQty] = useState(1)
 
-  const openCheckout = (qty = 1) => {
-    setCheckoutQty(qty)
+  const openCheckout = (qty: any = 1) => {
+    const finalQty = typeof qty === 'number' ? qty : 1;
+    setCheckoutQty(finalQty)
     trackEvent('InitiateCheckout')
     setCurrentView('checkout')
   }
