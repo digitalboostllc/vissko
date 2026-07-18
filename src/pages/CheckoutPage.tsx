@@ -7,10 +7,11 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_t
 
 interface CheckoutPageProps {
   onBack: () => void;
+  quantity: number;
 }
 
-export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
-  const [quantity, setQuantity] = useState(1)
+export const CheckoutPage = ({ onBack, quantity: initialQuantity }: CheckoutPageProps) => {
+  const [quantity, setQuantity] = useState(initialQuantity)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -21,10 +22,11 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
     setClientSecret(null) // Unmount old iframe while loading
 
     try {
+      const discount = localStorage.getItem('vissko_coupon');
       const res = await fetch('/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: qty })
+        body: JSON.stringify({ quantity: qty, discount })
       })
       const data = await res.json()
       if (data.clientSecret) {
@@ -142,12 +144,18 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
           <div className="space-y-3 text-sm text-zinc-600">
             <div className="flex justify-between">
               <span>Sous-total</span>
-              <span className="font-medium text-zinc-900">{(59.99 * quantity).toFixed(2)}€</span>
+              <span className="font-medium text-zinc-900">{(129.00 * quantity).toFixed(2)}€</span>
             </div>
             <div className="flex justify-between text-emerald-600">
-              <span>Réduction Flash (-33%)</span>
-              <span className="font-medium">-{(20.00 * quantity).toFixed(2)}€</span>
+              <span>Réduction</span>
+              <span className="font-medium">-{(40.00 * quantity).toFixed(2)}€</span>
             </div>
+            {localStorage.getItem('vissko_coupon') === 'SAVE10' && (
+              <div className="flex justify-between text-amber-600">
+                <span>Code Promo (SAVE10)</span>
+                <span className="font-medium">-{((89.00 * quantity) * 0.1).toFixed(2)}€</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Livraison Suivie (10-15 jours)</span>
               <span className="font-medium text-zinc-900">Gratuite</span>
@@ -159,7 +167,11 @@ export const CheckoutPage = ({ onBack }: CheckoutPageProps) => {
           {/* Total */}
           <div className="flex justify-between items-center mb-8">
             <span className="text-lg font-bold">Total</span>
-            <span className="text-2xl font-black">{(89.00 * quantity).toFixed(2)}€</span>
+            <span className="text-2xl font-black">
+              {localStorage.getItem('vissko_coupon') === 'SAVE10' 
+                ? ((89.00 * quantity) * 0.9).toFixed(2)
+                : (89.00 * quantity).toFixed(2)}€
+            </span>
           </div>
 
           {/* Trust Badges */}

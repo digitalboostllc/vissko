@@ -20,6 +20,8 @@ import { CGVPage } from '@/pages/CGVPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { SuccessPage } from '@/pages/SuccessPage'
 import { AdminPage } from '@/pages/AdminPage'
+import { LiveSalesPopup } from '@/components/LiveSalesPopup'
+import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { trackEvent } from '@/lib/tracking'
 
 type ViewState = 'landing' | 'checkout' | 'tracking' | 'cgv' | 'privacy' | 'success' | 'admin'
@@ -27,8 +29,10 @@ type ViewState = 'landing' | 'checkout' | 'tracking' | 'cgv' | 'privacy' | 'succ
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('landing')
   const [hasShownExitIntent, setHasShownExitIntent] = useState(false)
+  const [checkoutQty, setCheckoutQty] = useState(1)
 
-  const openCheckout = () => {
+  const openCheckout = (qty = 1) => {
+    setCheckoutQty(qty)
     trackEvent('InitiateCheckout')
     setCurrentView('checkout')
   }
@@ -37,6 +41,35 @@ function App() {
   const navigateTo = (view: ViewState) => setCurrentView(view)
 
   useEffect(() => {
+    const schema = {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      "name": "Vissko Ventilateur Portable",
+      "image": "https://vissko.us/assets/vissko-fan-hero.png",
+      "description": "Ventilateur multifonction tour de cou, 5 vitesses, écran LED.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Vissko"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://vissko.us",
+        "priceCurrency": "EUR",
+        "price": "89.00",
+        "availability": "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/NewCondition"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "1204"
+      }
+    };
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.text = JSON.stringify(schema)
+    document.head.appendChild(script)
+
     // Check if we are returning from Stripe checkout
     if (window.location.pathname === '/return') {
       setCurrentView('success')
@@ -58,12 +91,13 @@ function App() {
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave)
       delete (window as any).openTracking
+      document.head.removeChild(script)
     }
   }, [hasShownExitIntent, currentView])
 
-  if (currentView === 'checkout') {
-    return <CheckoutPage onBack={goHome} />
-  }
+    if (currentView === 'checkout') {
+      return <CheckoutPage onBack={goHome} quantity={checkoutQty} />
+    }
 
   if (currentView === 'tracking') {
     return <TrackingPage onBack={goHome} />
@@ -106,6 +140,8 @@ function App() {
 
       <StickyCTA onBuyClick={openCheckout} />
       <CookieBanner />
+      <LiveSalesPopup />
+      {hasShownExitIntent && <ExitIntentModal onClose={() => setHasShownExitIntent(false)} onBuyClick={openCheckout} />}
     </SmoothScroll>
   )
 }

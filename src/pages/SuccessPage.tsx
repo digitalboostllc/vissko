@@ -15,24 +15,32 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
   const [orderId, setOrderId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpsellLoading, setIsUpsellLoading] = useState(false)
+  const [upsellSuccess, setUpsellSuccess] = useState(false)
 
   const handleUpsell = async () => {
     setIsUpsellLoading(true)
     try {
       const queryString = window.location.search
       const urlParams = new URLSearchParams(queryString)
+      const sessionId = urlParams.get('session_id')
       
-      const response = await fetch(`/create-upsell-checkout-session`, {
+      const response = await fetch('/api/one-click-upsell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ original_session_id: urlParams.get('session_id') })
+        body: JSON.stringify({ original_session_id: sessionId })
       })
-      const { url } = await response.json()
-      if (url) {
-        window.location.href = url
+      const data = await response.json()
+      
+      if (data.success) {
+        setUpsellSuccess(true)
+      } else {
+        console.error('Upsell failed:', data.error)
+        alert('Impossible de traiter la demande avec le moyen de paiement enregistré.')
       }
     } catch (error) {
       console.error('Upsell error:', error)
+      alert('Une erreur est survenue.')
+    } finally {
       setIsUpsellLoading(false)
     }
   }
@@ -128,34 +136,50 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
           </div>
 
           {/* Upsell Box */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200 mb-8 text-left relative overflow-hidden shadow-sm">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              <h3 className="font-bold text-amber-900 text-lg">Offre Exclusive !</h3>
-            </div>
-            <p className="text-amber-800 text-sm mb-4 leading-relaxed">
-              Ajoutez un <strong>2ème ventilateur Vissko</strong> pour un proche avec <strong className="text-amber-600">40% de réduction immédiate</strong> ! Parfait pour les couples ou comme cadeau d'été.
-            </p>
-            <div className="flex items-center justify-between bg-white/60 p-3 rounded-xl mb-4">
-              <span className="line-through text-zinc-400 text-sm">89,00 €</span>
-              <span className="font-black text-2xl text-amber-600">53,40 €</span>
-            </div>
-            <Button 
-              onClick={handleUpsell}
-              disabled={isUpsellLoading}
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-6 rounded-xl shadow-sm text-base flex items-center justify-center transition-all"
+          {upsellSuccess ? (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="bg-emerald-50 rounded-2xl p-6 border border-emerald-200 mb-8 text-center"
             >
-              {isUpsellLoading ? (
-                <RefreshCw className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <Gift className="w-5 h-5 mr-2" />
-                  Profiter de l'offre (-40%)
-                </>
-              )}
-            </Button>
-          </div>
+              <div className="flex justify-center mb-4">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+              </div>
+              <h3 className="font-bold text-emerald-900 text-lg mb-2">Offre Ajoutée avec Succès !</h3>
+              <p className="text-emerald-800 text-sm">
+                Votre deuxième ventilateur a été ajouté à votre commande pour seulement 53,40 €. Vous n'avez rien d'autre à faire.
+              </p>
+            </motion.div>
+          ) : (
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200 mb-8 text-left relative overflow-hidden shadow-sm">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-5 h-5 text-amber-500" />
+                <h3 className="font-bold text-amber-900 text-lg">Offre Exclusive !</h3>
+              </div>
+              <p className="text-amber-800 text-sm mb-4 leading-relaxed">
+                Ajoutez un <strong>2ème ventilateur Vissko</strong> pour un proche avec <strong className="text-amber-600">40% de réduction immédiate</strong> ! Parfait pour les couples ou comme cadeau d'été.
+              </p>
+              <div className="flex items-center justify-between bg-white/60 p-3 rounded-xl mb-4">
+                <span className="line-through text-zinc-400 text-sm">89,00 €</span>
+                <span className="font-black text-2xl text-amber-600">53,40 €</span>
+              </div>
+              <Button 
+                onClick={handleUpsell}
+                disabled={isUpsellLoading}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-6 rounded-xl shadow-sm text-base flex items-center justify-center transition-all"
+              >
+                {isUpsellLoading ? (
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Gift className="w-5 h-5 mr-2" />
+                    Profiter de l'offre (-40%)
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-4 w-full">
             <Button 

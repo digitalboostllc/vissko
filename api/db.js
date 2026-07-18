@@ -44,4 +44,11 @@ export const updateOrderStatusByEmail = async (email, status) => {
   });
 };
 
+export const updateOrderStatusById = async (id, status) => {
+  return await client.execute({
+    sql: 'UPDATE orders SET status = ? WHERE id = ?',
+    args: [status, id]
+  });
+};
+
 export default client;

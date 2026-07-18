@@ -1,11 +1,10 @@
 import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ShoppingCart, Star, Clock, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Star, Clock, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface HeroProps {
-  onBuyClick?: () => void;
+  onBuyClick?: (quantity: number) => void;
 }
 
 export const Hero = ({ onBuyClick }: HeroProps) => {
@@ -72,20 +71,39 @@ export const Hero = ({ onBuyClick }: HeroProps) => {
               Vissko redéfinit le confort. Batterie haute capacité de 1800mAh, 5 vitesses silencieuses, et écran LED intelligent. Portez-le autour du cou ou tenez-le en main.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 w-full">
-              <div className="flex flex-col">
-                <span className="text-4xl font-bold text-foreground">89.00€</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg text-muted-foreground line-through decoration-destructive/50 decoration-2">129.00€</span>
-                  <Badge className="bg-destructive text-white rounded-md text-xs font-bold">-33%</Badge>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 w-full max-w-2xl">
+              {/* Option 1 */}
+              <button 
+                onClick={() => onBuyClick?.(1)} 
+                className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-zinc-200 hover:border-black transition-all bg-white relative group"
+              >
+                <span className="text-sm font-bold text-zinc-500 mb-1">1 Ventilateur</span>
+                <span className="text-2xl font-black text-black">89€</span>
+                <span className="text-xs text-zinc-400 line-through mt-1">129€</span>
+              </button>
+              
+              {/* Option 2 */}
+              <button 
+                onClick={() => onBuyClick?.(2)} 
+                className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-amber-400 bg-amber-50 hover:bg-amber-100 transition-all relative group shadow-sm"
+              >
+                <div className="absolute -top-3 bg-amber-400 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
+                  Le plus populaire
                 </div>
-              </div>
+                <span className="text-sm font-bold text-amber-900 mb-1 mt-1">2 Ventilateurs</span>
+                <span className="text-2xl font-black text-amber-600">142€</span>
+                <span className="text-[10px] font-bold text-amber-500 mt-1 uppercase tracking-widest">-20% (71€/unité)</span>
+              </button>
 
-              <Button onClick={onBuyClick} size="lg" className="rounded-full bg-foreground hover:bg-foreground/90 text-background font-bold text-lg px-8 py-6 h-auto w-full sm:w-auto transition-all hover:scale-105 group">
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Acheter Maintenant
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              {/* Option 3 */}
+              <button 
+                onClick={() => onBuyClick?.(3)} 
+                className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-zinc-200 hover:border-black transition-all bg-white relative group"
+              >
+                <span className="text-sm font-bold text-zinc-500 mb-1">3 Ventilateurs</span>
+                <span className="text-2xl font-black text-black">186€</span>
+                <span className="text-[10px] font-bold text-emerald-500 mt-1 uppercase tracking-widest">-30% (62€/unité)</span>
+              </button>
             </div>
 
             <div className="flex flex-col gap-3 bg-secondary/50 rounded-2xl p-4 w-full sm:w-auto border border-border/50">

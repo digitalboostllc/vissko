@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import crypto from 'crypto';
-import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail } from './db.js';
+import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail, updateOrderStatusById } from './db.js';
 
 dotenv.config();
 
@@ -144,6 +144,29 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
         console.error('Error updating refund status:', err);
       }
     }
+  } else if (event.type === 'checkout.session.expired') {
+    // Abandoned Cart Recovery
+    const session = event.data.object;
+    const email = session.customer_details?.email;
+    if (email) {
+      try {
+        await resend.emails.send({
+          from: 'Vissko <orders@vissko.us>',
+          to: email,
+          subject: 'Vous avez oublié votre Vissko !',
+          html: `
+            <div style="font-family: sans-serif; text-align: center; padding: 40px;">
+              <h2>Vous avez oublié quelque chose...</h2>
+              <p>Votre ventilateur Vissko vous attend toujours ! Finalisez votre commande avant que les stocks ne soient épuisés.</p>
+              <a href="https://vissko.us/" style="display: inline-block; background: #18181b; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 999px; margin-top: 20px;">Reprendre ma commande</a>
+            </div>
+          `
+        });
+        console.log(`🛒 Abandoned cart email sent to ${email}`);
+      } catch (err) {
+        console.error('Error sending abandoned cart email:', err);
+      }
+    }
   }
 
   response.send();
@@ -155,11 +178,17 @@ app.use(express.json());
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const quantity = parseInt(req.body.quantity, 10) || 1;
-    // Dynamically get the domain so it works on Vercel without env variables
+    // Extract discount coupon from body
+    const discount = req.body.discount;
     const currentDomain = req.headers.origin || process.env.DOMAIN || 'http://localhost:5173';
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams = {
       ui_mode: 'embedded',
+      customer_creation: 'always', // Required for 1-click upsells
+      payment_intent_data: {
+        setup_future_usage: 'on_session',
+      },
+      expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // Expire in 30 mins for Abandoned Cart recovery
       line_items: [
         {
           price_data: {
@@ -182,7 +211,13 @@ app.post('/create-checkout-session', async (req, res) => {
         enabled: true,
       },
       return_url: `${currentDomain}/return?session_id={CHECKOUT_SESSION_ID}`,
-    });
+    };
+
+    if (discount === 'SAVE10') {
+      sessionParams.discounts = [{ coupon: 'SAVE10' }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     res.send({ clientSecret: session.client_secret });
   } catch (error) {
@@ -191,41 +226,30 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-app.post('/create-upsell-checkout-session', async (req, res) => {
+app.post('/api/one-click-upsell', async (req, res) => {
   try {
-    const currentDomain = req.headers.origin || process.env.DOMAIN || 'http://localhost:5173';
+    const { original_session_id } = req.body;
+    const session = await stripe.checkout.sessions.retrieve(original_session_id, {
+      expand: ['payment_intent', 'payment_intent.payment_method']
+    });
     
-    // Upsell: 40% off = 53.40 EUR. We use hosted mode for a quick redirect.
-    const session = await stripe.checkout.sessions.create({
-      ui_mode: 'hosted',
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: 'Vissko Ventilateur Portable (Offre Exclusive -40%)',
-              description: 'Ajouté à la commande existante',
-              images: [`${currentDomain}/assets/vissko-fan-hero.png`],
-            },
-            unit_amount: 5340, // 53.40€
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      shipping_address_collection: {
-        allowed_countries: ['FR', 'BE', 'CH', 'LU', 'MC', 'CA', 'US'],
-      },
-      phone_number_collection: {
-        enabled: true,
-      },
-      success_url: `${currentDomain}/return?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${currentDomain}/return?session_id=${req.body.original_session_id}`,
+    if (!session.customer || !session.payment_intent?.payment_method) {
+      return res.status(400).send({ error: 'No saved payment method found' });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 5340,
+      currency: 'eur',
+      customer: session.customer,
+      payment_method: session.payment_intent.payment_method.id,
+      off_session: true,
+      confirm: true,
+      description: 'Vissko Ventilateur Portable (Upsell -40%)'
     });
 
-    res.send({ url: session.url });
+    res.send({ success: true, paymentIntent });
   } catch (error) {
-    console.error('Error creating Upsell session:', error);
+    console.error('Error creating 1-click upsell:', error);
     res.status(500).send({ error: error.message });
   }
 });
@@ -276,6 +300,42 @@ app.get('/api/admin/orders', async (req, res) => {
     res.send(orders);
   } catch (error) {
     console.error('Error fetching all orders from Turso:', error);
+    res.status(500).send({ error: 'Database error' });
+  }
+});
+
+// Admin Shipping Endpoint
+app.put('/api/admin/orders/:id', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const { id } = req.params;
+  const { status, tracking_url, email } = req.body;
+
+  try {
+    await updateOrderStatusById(id, status);
+    
+    if (status === 'shipped' && email) {
+      await resend.emails.send({
+        from: 'Vissko <orders@vissko.us>',
+        to: email,
+        subject: 'Votre commande Vissko est expédiée !',
+        html: `
+          <div style="font-family: sans-serif; text-align: center; padding: 40px;">
+            <h2>Bonne nouvelle !</h2>
+            <p>Votre commande <strong>${id}</strong> est en route.</p>
+            ${tracking_url ? `<p>Vous pouvez suivre votre colis ici : <a href="${tracking_url}">${tracking_url}</a></p>` : ''}
+            <p>Merci pour votre achat !</p>
+          </div>
+        `
+      });
+    }
+
+    res.send({ success: true });
+  } catch (error) {
+    console.error('Error updating order status:', error);
     res.status(500).send({ error: 'Database error' });
   }
 });
