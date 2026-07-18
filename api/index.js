@@ -66,7 +66,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-w-xl; margin: auto; padding: 40px 20px; background-color: #ffffff; color: #18181b;">
               <div style="text-align: center; margin-bottom: 30px;">
-                <img src="https://vissko.us/assets/logo.svg" alt="Vissko Logo" style="height: 32px; width: auto; margin: 0 auto;" />
+                <img src="https://vissko.us/assets/logo.png" alt="Vissko Logo" style="height: 32px; width: auto; margin: 0 auto;" />
               </div>
               <div style="background-color: #fafafa; border: 1px solid #e4e4e7; border-radius: 24px; padding: 40px 30px; text-align: center;">
                 <h2 style="margin-top: 0; font-size: 24px; font-weight: 800; color: #18181b;">Commande Confirmée</h2>
