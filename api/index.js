@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import crypto from 'crypto';
-import { saveOrder, getOrder, getAllOrders, getOrderCount } from './db.js';
+import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail } from './db.js';
 
 dotenv.config();
 
@@ -131,6 +131,17 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
         }
       } catch (err) {
         console.error('Error sending CAPI event:', err);
+      }
+    }
+  } else if (event.type === 'charge.refunded') {
+    const charge = event.data.object;
+    const email = charge.billing_details?.email || charge.receipt_email;
+    if (email) {
+      try {
+        await updateOrderStatusByEmail(email, 'refunded');
+        console.log(`✅ Order for ${email} marked as refunded`);
+      } catch (err) {
+        console.error('Error updating refund status:', err);
       }
     }
   }

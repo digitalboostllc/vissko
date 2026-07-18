@@ -231,53 +231,63 @@ export const TrackingPage = ({ onBack }: TrackingPageProps) => {
                 </button>
               </div>
 
-              {/* Timeline */}
-              <div className="relative pl-12 md:pl-0 space-y-6 before:absolute before:inset-0 before:left-[15px] md:before:left-1/2 md:before:-translate-x-1/2 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-zinc-200 before:to-transparent">
-                
-                {timeline.map((step, idx) => {
-                  const { Icon, isCompleted, isCurrent, title, desc, location, dateStr } = step;
+              {orderData.status === 'refunded' ? (
+                <div className="bg-red-50 p-6 rounded-2xl border border-red-200 text-center">
+                  <XCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-red-800 font-bold text-lg mb-2">Commande Remboursée</h3>
+                  <p className="text-red-700 text-sm mb-2">
+                    Cette commande a été annulée et intégralement remboursée via votre moyen de paiement initial. L'expédition a été stoppée.
+                  </p>
+                  <p className="text-red-600/80 text-xs">Le remboursement apparaîtra sur votre relevé bancaire sous 5 à 10 jours ouvrés.</p>
+                </div>
+              ) : (
+                <div className="relative pl-12 md:pl-0 space-y-6 before:absolute before:inset-0 before:left-[15px] md:before:left-1/2 md:before:-translate-x-1/2 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-zinc-200 before:to-transparent">
                   
-                  // Styling based on state
-                  let iconBg = "bg-zinc-100";
-                  let iconBorder = "border-white";
-                  let iconColor = "text-zinc-400";
-                  let boxOpacity = "opacity-50";
-                  
-                  if (isCompleted) {
-                    iconBg = isCurrent ? "bg-amber-500" : "bg-emerald-500";
-                    iconColor = "text-white";
-                    boxOpacity = "opacity-100";
-                  }
+                  {timeline.map((step, idx) => {
+                    const { Icon, isCompleted, isCurrent, title, desc, location, dateStr } = step;
+                    
+                    // Styling based on state
+                    let iconBg = "bg-zinc-100";
+                    let iconBorder = "border-white";
+                    let iconColor = "text-zinc-400";
+                    let boxOpacity = "opacity-50";
+                    
+                    if (isCompleted) {
+                      iconBg = isCurrent ? "bg-amber-500" : "bg-emerald-500";
+                      iconColor = "text-white";
+                      boxOpacity = "opacity-100";
+                    }
 
-                  return (
-                    <div key={idx} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group transition-opacity duration-300 ${boxOpacity}`}>
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full border-[3px] ${iconBorder} ${iconBg} absolute left-0 md:left-1/2 md:-translate-x-1/2 z-10`}>
-                        <Icon className={`w-4 h-4 ${iconColor}`} />
-                      </div>
-                      
-                      <div className="w-full md:w-[calc(50%-2.5rem)] bg-zinc-50 p-4 rounded-xl border border-zinc-200 relative">
-                        {isCurrent && (
-                          <div className="absolute -top-2 -right-2 flex h-4 w-4">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-white"></span>
+                    return (
+                      <div key={idx} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group transition-opacity duration-300 ${boxOpacity}`}>
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full border-[3px] ${iconBorder} ${iconBg} absolute left-0 md:left-1/2 md:-translate-x-1/2 z-10`}>
+                          <Icon className={`w-4 h-4 ${iconColor}`} />
+                        </div>
+                        
+                        <div className="w-full md:w-[calc(50%-2.5rem)] bg-zinc-50 p-4 rounded-xl border border-zinc-200 relative">
+                          {isCurrent && (
+                            <div className="absolute -top-2 -right-2 flex h-4 w-4">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-white"></span>
+                            </div>
+                          )}
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-1 mb-1">
+                            <div className="font-bold text-zinc-900 text-sm">{title}</div>
+                            <div className="text-[10px] font-bold text-zinc-500 bg-zinc-200/50 px-2 py-0.5 rounded-full inline-block w-fit">
+                              {dateStr}
+                            </div>
                           </div>
-                        )}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-1 mb-1">
-                          <div className="font-bold text-zinc-900 text-sm">{title}</div>
-                          <div className="text-[10px] font-bold text-zinc-500 bg-zinc-200/50 px-2 py-0.5 rounded-full inline-block w-fit">
-                            {dateStr}
+                          <div className="text-xs text-zinc-600 mb-2">{desc}</div>
+                          <div className="flex items-center gap-1 text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
+                            <MapPin className="w-3 h-3" /> {location}
                           </div>
                         </div>
-                        <div className="text-xs text-zinc-600 mb-2">{desc}</div>
-                        <div className="flex items-center gap-1 text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
-                          <MapPin className="w-3 h-3" /> {location}
-                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
 
-              </div>
+                </div>
+              )}
             </motion.div>
           )}
         </div>

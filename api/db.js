@@ -37,4 +37,11 @@ export const getOrderCount = async () => {
   return Number(result.rows[0].count);
 };
 
+export const updateOrderStatusByEmail = async (email, status) => {
+  return await client.execute({
+    sql: 'UPDATE orders SET status = ? WHERE email = ?',
+    args: [status, email]
+  });
+};
+
 export default client;
