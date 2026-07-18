@@ -10,11 +10,11 @@ const client = createClient({
 // Table 'orders' must be created manually or via init scripts.
 // The schema is: id (TEXT), email (TEXT), status (TEXT), created_at (DATETIME)
 
-export const saveOrder = async (id, email, customerName = null, phone = null, shippingAddress = null) => {
+export const saveOrder = async (id, email, customerName = null, phone = null, shippingAddress = null, stripePiId = null) => {
   const addressJson = shippingAddress ? JSON.stringify(shippingAddress) : null;
   return await client.execute({
-    sql: 'INSERT OR IGNORE INTO orders (id, email, customer_name, phone, shipping_address, status) VALUES (?, ?, ?, ?, ?, ?)',
-    args: [id, email, customerName, phone, addressJson, 'confirmed']
+    sql: 'INSERT OR IGNORE INTO orders (id, email, customer_name, phone, shipping_address, status, stripe_pi_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    args: [id, email, customerName, phone, addressJson, 'confirmed', stripePiId]
   });
 };
 
@@ -48,6 +48,13 @@ export const updateOrderStatusById = async (id, status) => {
   return await client.execute({
     sql: 'UPDATE orders SET status = ? WHERE id = ?',
     args: [status, id]
+  });
+};
+
+export const updateOrderStatusByPiId = async (piId, status) => {
+  return await client.execute({
+    sql: 'UPDATE orders SET status = ? WHERE stripe_pi_id = ?',
+    args: [status, piId]
   });
 };
 

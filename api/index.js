@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import crypto from 'crypto';
-import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail, updateOrderStatusById } from './db.js';
+import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail, updateOrderStatusById, updateOrderStatusByPiId } from './db.js';
 
 dotenv.config();
 
@@ -49,10 +49,11 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
 
     if (customerEmail) {
       const shortId = 'VSK-' + orderId.slice(-8).toUpperCase();
+      const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
 
       // 1. Save to Database
       try {
-        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress);
+        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress, paymentIntentId);
         console.log(`✅ Order ${shortId} saved to database for ${customerEmail}`);
       } catch (err) {
         console.error('Error saving order to DB:', err);
@@ -165,6 +166,20 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
         console.log(`🛒 Abandoned cart email sent to ${email}`);
       } catch (err) {
         console.error('Error sending abandoned cart email:', err);
+      }
+    }
+  } else if (event.type === 'charge.dispute.created') {
+    // Dispute / Chargeback handling
+    const dispute = event.data.object;
+    const paymentIntentId = dispute.charge ? (typeof dispute.charge === 'string' ? null : dispute.charge.payment_intent) : dispute.payment_intent;
+    const piIdToUse = paymentIntentId || dispute.payment_intent; // dispute object has payment_intent in newer versions, or inside charge
+    
+    if (piIdToUse) {
+      try {
+        await updateOrderStatusByPiId(piIdToUse, 'disputed');
+        console.log(`🚨 Dispute registered for PaymentIntent ${piIdToUse}`);
+      } catch (err) {
+        console.error('Error updating dispute status:', err);
       }
     }
   }
@@ -340,6 +355,38 @@ app.put('/api/admin/orders/:id', async (req, res) => {
   }
 });
 
+// Admin Refund Endpoint
+app.post('/api/admin/orders/:id/refund', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+
+  const { id } = req.params;
+  const { stripe_pi_id } = req.body;
+
+  if (!stripe_pi_id) {
+    return res.status(400).send({ error: 'Missing Stripe PaymentIntent ID' });
+  }
+
+  try {
+    // Call Stripe API to refund
+    const refund = await stripe.refunds.create({
+      payment_intent: stripe_pi_id,
+    });
+
+    if (refund.status === 'succeeded' || refund.status === 'pending') {
+      await updateOrderStatusById(id, 'refunded');
+      res.send({ success: true, refund });
+    } else {
+      res.status(400).send({ error: 'Refund failed to process' });
+    }
+  } catch (error) {
+    console.error('Stripe refund error:', error);
+    res.status(500).send({ error: error.message || 'Refund error' });
+  }
+});
+
 app.get('/session-status', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
@@ -349,9 +396,10 @@ app.get('/session-status', async (req, res) => {
       const customerName = session.customer_details?.name || session.shipping_details?.name || null;
       const phone = session.customer_details?.phone || null;
       const shippingAddress = session.shipping_details?.address || null;
+      const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
       // Bulletproof fallback: save order immediately if webhook hasn't fired yet
       try {
-        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress);
+        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress, paymentIntentId);
         console.log(`✅ Order ${shortId} proactively saved in session-status`);
       } catch (err) {
         console.error('Error saving order proactively:', err);

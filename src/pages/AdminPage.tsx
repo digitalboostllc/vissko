@@ -13,6 +13,7 @@ interface Order {
   phone: string | null;
   shipping_address: string | null;
   status: string;
+  stripe_pi_id: string | null;
   created_at: string;
 }
 
@@ -23,8 +24,10 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [shippingModal, setShippingModal] = useState<{ isOpen: boolean; orderId: string | null; email: string | null }>({ isOpen: false, orderId: null, email: null })
+  const [refundModal, setRefundModal] = useState<{ isOpen: boolean; orderId: string | null; piId: string | null }>({ isOpen: false, orderId: null, piId: null })
   const [trackingUrl, setTrackingUrl] = useState('')
   const [isShipping, setIsShipping] = useState(false)
+  const [isRefunding, setIsRefunding] = useState(false)
 
   // Check session storage on mount
   useEffect(() => {
@@ -78,31 +81,69 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
     sessionStorage.removeItem('admin_token')
   }
 
-  const markAsShipped = async () => {
-    if (!shippingModal.orderId) return;
-    setIsShipping(true);
+  const handleShipping = async () => {
+    if (!shippingModal.orderId) return
+    
+    setIsShipping(true)
     try {
       const response = await fetch(`/api/admin/orders/${shippingModal.orderId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${password}`
+          'Authorization': `Bearer ${password}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-          status: 'shipped', 
+          status: 'shipped',
           tracking_url: trackingUrl,
-          email: shippingModal.email 
+          email: shippingModal.email
         })
-      });
+      })
+
       if (response.ok) {
-        setOrders(orders.map(o => o.id === shippingModal.orderId ? { ...o, status: 'shipped' } : o));
-        setShippingModal({ isOpen: false, orderId: null, email: null });
-        setTrackingUrl('');
+        setOrders(orders.map(o => 
+          o.id === shippingModal.orderId ? { ...o, status: 'shipped' } : o
+        ))
+        setShippingModal({ isOpen: false, orderId: null, email: null })
+        setTrackingUrl('')
+      } else {
+        alert('Erreur lors de la mise à jour')
       }
     } catch (err) {
-      console.error(err);
+      alert('Erreur réseau')
     } finally {
-      setIsShipping(false);
+      setIsShipping(false)
+    }
+  }
+
+  const handleRefund = async () => {
+    if (!refundModal.orderId || !refundModal.piId) return
+    
+    setIsRefunding(true)
+    try {
+      const response = await fetch(`/api/admin/orders/${refundModal.orderId}/refund`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${password}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          stripe_pi_id: refundModal.piId
+        })
+      })
+
+      if (response.ok) {
+        setOrders(orders.map(o => 
+          o.id === refundModal.orderId ? { ...o, status: 'refunded' } : o
+        ))
+        setRefundModal({ isOpen: false, orderId: null, piId: null })
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Erreur lors du remboursement')
+      }
+    } catch (err) {
+      alert('Erreur réseau')
+    } finally {
+      setIsRefunding(false)
     }
   }
 
@@ -325,23 +366,49 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
                         {order.phone && <div className="text-xs text-zinc-500 mt-1">{order.phone}</div>}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-bold uppercase ${
-                          order.status === 'confirmed' ? 'bg-amber-100 text-amber-800' :
-                          order.status === 'shipped' ? 'bg-emerald-100 text-emerald-800' :
-                          order.status === 'refunded' ? 'bg-red-100 text-red-800' :
-                          'bg-zinc-100 text-zinc-800'
-                        }`}>
-                          {order.status}
-                        </span>
+                        {order.status === 'confirmed' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
+                            Confirmé
+                          </span>
+                        )}
+                        {order.status === 'shipped' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            Expédié
+                          </span>
+                        )}
+                        {order.status === 'refunded' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
+                            Remboursé
+                          </span>
+                        )}
+                        {order.status === 'disputed' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-rose-600 text-white shadow-sm animate-pulse">
+                            Litige (Disputed)
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right">
                         {order.status === 'confirmed' && (
-                          <button
-                            onClick={() => setShippingModal({ isOpen: true, orderId: order.id, email: order.email })}
-                            className="bg-black text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-zinc-800 transition-colors"
-                          >
-                            Expédier
-                          </button>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => setShippingModal({ isOpen: true, orderId: order.id, email: order.email })}
+                              className="inline-flex items-center px-3 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded hover:bg-zinc-800 transition-colors"
+                            >
+                              <Package className="w-3.5 h-3.5 mr-1.5" />
+                              Expédier
+                            </button>
+                            {order.stripe_pi_id && (
+                              <button
+                                onClick={() => setRefundModal({ isOpen: true, orderId: order.id, piId: order.stripe_pi_id })}
+                                className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-xs font-medium rounded border border-red-200 hover:bg-red-100 transition-colors"
+                              >
+                                Rembourser
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        {(order.status === 'shipped' || order.status === 'refunded' || order.status === 'disputed') && (
+                          <span className="text-zinc-400 text-sm">-</span>
                         )}
                       </td>
                     </tr>
@@ -390,12 +457,43 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
                 Annuler
               </button>
               <button
-                onClick={markAsShipped}
+                onClick={handleShipping}
                 disabled={isShipping}
                 className="bg-emerald-600 text-white px-6 py-2 rounded text-sm font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center"
               >
                 {isShipping ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Confirmer l'expédition
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Refund Modal */}
+      {refundModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded border border-zinc-200 p-6 max-w-md w-full flex flex-col gap-6">
+            <div>
+              <h3 className="text-xl font-bold text-red-600 mb-2">Rembourser la commande</h3>
+              <p className="text-sm text-zinc-500">
+                Êtes-vous sûr de vouloir rembourser la commande {refundModal.orderId} ? Cette action est irréversible et l'argent sera renvoyé sur le compte du client.
+              </p>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setRefundModal({ isOpen: false, orderId: null, piId: null })}
+                className="px-4 py-2 text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleRefund}
+                disabled={isRefunding}
+                className="bg-red-600 text-white px-6 py-2 rounded text-sm font-bold hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center"
+              >
+                {isRefunding ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                Confirmer le remboursement
               </button>
             </div>
           </div>
