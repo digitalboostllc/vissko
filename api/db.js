@@ -32,4 +32,9 @@ export const getAllOrders = async () => {
   return result.rows;
 };
 
+export const getOrderCount = async () => {
+  const result = await client.execute('SELECT COUNT(*) as count FROM orders');
+  return Number(result.rows[0].count);
+};
+
 export default client;

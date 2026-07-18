@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import crypto from 'crypto';
-import { saveOrder, getOrder, getAllOrders } from './db.js';
+import { saveOrder, getOrder, getAllOrders, getOrderCount } from './db.js';
 
 dotenv.config();
 
@@ -177,6 +177,56 @@ app.post('/create-checkout-session', async (req, res) => {
   } catch (error) {
     console.error('Error creating Stripe session:', error);
     res.status(500).send({ error: error.message });
+  }
+});
+
+app.post('/create-upsell-checkout-session', async (req, res) => {
+  try {
+    const currentDomain = req.headers.origin || process.env.DOMAIN || 'http://localhost:5173';
+    
+    // Upsell: 40% off = 53.40 EUR. We use hosted mode for a quick redirect.
+    const session = await stripe.checkout.sessions.create({
+      ui_mode: 'hosted',
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'Vissko Ventilateur Portable (Offre Exclusive -40%)',
+              description: 'Ajouté à la commande existante',
+              images: [`${currentDomain}/assets/vissko-fan-hero.png`],
+            },
+            unit_amount: 5340, // 53.40€
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      shipping_address_collection: {
+        allowed_countries: ['FR', 'BE', 'CH', 'LU', 'MC', 'CA', 'US'],
+      },
+      phone_number_collection: {
+        enabled: true,
+      },
+      success_url: `${currentDomain}/return?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${currentDomain}/return?session_id=${req.body.original_session_id}`,
+    });
+
+    res.send({ url: session.url });
+  } catch (error) {
+    console.error('Error creating Upsell session:', error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+app.get('/api/stock', async (req, res) => {
+  try {
+    const count = await getOrderCount();
+    // Start at 24. For every order, reduce by 1. Minimum limit 3.
+    const remaining = Math.max(3, 24 - count);
+    res.send({ stock: remaining });
+  } catch (err) {
+    res.send({ stock: 14 }); // Fallback
   }
 });
 

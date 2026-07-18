@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CheckCircle2, Package, ArrowRight, RefreshCw, XCircle } from 'lucide-react'
+import { CheckCircle2, Package, ArrowRight, RefreshCw, XCircle, Gift, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 
@@ -14,6 +14,29 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
   const [customerEmail, setCustomerEmail] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isUpsellLoading, setIsUpsellLoading] = useState(false)
+
+  const handleUpsell = async () => {
+    setIsUpsellLoading(true)
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4242'
+      const queryString = window.location.search
+      const urlParams = new URLSearchParams(queryString)
+      
+      const response = await fetch(`${apiUrl}/create-upsell-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ original_session_id: urlParams.get('session_id') })
+      })
+      const { url } = await response.json()
+      if (url) {
+        window.location.href = url
+      }
+    } catch (error) {
+      console.error('Upsell error:', error)
+      setIsUpsellLoading(false)
+    }
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -103,6 +126,36 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
               <RefreshCw className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
               <p>Votre commande est en cours de préparation. La livraison suivie prend généralement de 10 à 15 jours ouvrés.</p>
             </div>
+          </div>
+
+          {/* Upsell Box */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200 mb-8 text-left relative overflow-hidden shadow-sm">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              <h3 className="font-bold text-amber-900 text-lg">Offre Exclusive !</h3>
+            </div>
+            <p className="text-amber-800 text-sm mb-4 leading-relaxed">
+              Ajoutez un <strong>2ème ventilateur Vissko</strong> pour un proche avec <strong className="text-amber-600">40% de réduction immédiate</strong> ! Parfait pour les couples ou comme cadeau d'été.
+            </p>
+            <div className="flex items-center justify-between bg-white/60 p-3 rounded-xl mb-4">
+              <span className="line-through text-zinc-400 text-sm">89,00 €</span>
+              <span className="font-black text-2xl text-amber-600">53,40 €</span>
+            </div>
+            <Button 
+              onClick={handleUpsell}
+              disabled={isUpsellLoading}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-6 rounded-xl shadow-sm text-base flex items-center justify-center transition-all"
+            >
+              {isUpsellLoading ? (
+                <RefreshCw className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Gift className="w-5 h-5 mr-2" />
+                  Profiter de l'offre (-40%)
+                </>
+              )}
+            </Button>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full">

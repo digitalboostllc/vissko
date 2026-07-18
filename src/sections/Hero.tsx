@@ -9,15 +9,26 @@ interface HeroProps {
 }
 
 export const Hero = ({ onBuyClick }: HeroProps) => {
-  // Low stock counter
   const [stock, setStock] = useState(14)
 
   useEffect(() => {
-    // Simulate stock decreasing slowly
-    const timer = setInterval(() => {
-      setStock((prev) => (prev > 3 ? prev - 1 : prev))
-    }, 45000)
-    return () => clearInterval(timer)
+    // Fetch live stock from backend
+    const fetchStock = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4242'
+        const res = await fetch(`${apiUrl}/api/stock`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.stock) {
+            setStock(data.stock)
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch stock', err)
+      }
+    }
+    
+    fetchStock()
   }, [])
 
   return (
