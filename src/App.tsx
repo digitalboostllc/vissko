@@ -41,6 +41,7 @@ function App() {
   const openTracking = () => setCurrentView('tracking')
   const navigateTo = (view: ViewState) => setCurrentView(view)
 
+  // Initialization Effect (Run Once)
   useEffect(() => {
     // UTM Capture
     const params = new URLSearchParams(window.location.search)
@@ -131,6 +132,16 @@ function App() {
     // Expose openTracking globally so the Header can call it
     (window as any).openTracking = openTracking
 
+    return () => {
+      delete (window as any).openTracking
+      if (document.head.contains(script)) {
+        document.head.removeChild(script)
+      }
+    }
+  }, []) // Empty dependency array -> runs exactly once!
+
+  // Exit Intent Event Listener Effect (Depends on state)
+  useEffect(() => {
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0 && !hasShownExitIntent && currentView === 'landing') {
         setHasShownExitIntent(true)
@@ -140,8 +151,6 @@ function App() {
     document.addEventListener('mouseleave', handleMouseLeave)
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave)
-      delete (window as any).openTracking
-      document.head.removeChild(script)
     }
   }, [hasShownExitIntent, currentView])
 
