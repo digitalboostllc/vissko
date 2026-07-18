@@ -14,10 +14,12 @@ const mockSales = [
 export const LiveSalesPopup = () => {
   const [currentSale, setCurrentSale] = useState(mockSales[0]);
   const [isVisible, setIsVisible] = useState(false);
+  const [exitX, setExitX] = useState(0);
 
   useEffect(() => {
     // Initial delay before first popup
     const initialDelay = setTimeout(() => {
+      setExitX(0);
       setIsVisible(true);
       
       // Hide after 5 seconds
@@ -29,6 +31,7 @@ export const LiveSalesPopup = () => {
       // Pick random sale
       const randomSale = mockSales[Math.floor(Math.random() * mockSales.length)];
       setCurrentSale(randomSale);
+      setExitX(0);
       setIsVisible(true);
       
       // Hide after 5 seconds
@@ -47,12 +50,13 @@ export const LiveSalesPopup = () => {
         <motion.div
           initial={{ opacity: 0, y: 50, x: 0 }}
           animate={{ opacity: 1, y: 0, x: 0 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          exit={{ opacity: 0, x: exitX, scale: 0.8, transition: { duration: 0.2 } }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.7}
           onDragEnd={(_, { offset, velocity }) => {
             if (Math.abs(offset.x) > 100 || Math.abs(velocity.x) > 500) {
+              setExitX(offset.x);
               setIsVisible(false);
             }
           }}
