@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Search, Package, Truck, CheckCircle2, ChevronLeft, Plane, MapPin } from 'lucide-react'
+import { Search, Package, Truck, CheckCircle2, ChevronLeft, Plane, MapPin, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
 
