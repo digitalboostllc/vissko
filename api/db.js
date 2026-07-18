@@ -9,14 +9,14 @@ const client = createClient({
 
 export const saveOrder = async (
   id, email, customerName = null, phone = null, shippingAddress = null, stripePiId = null,
-  utmSource = null, utmMedium = null, utmCampaign = null, fbc = null, fbp = null
+  utmSource = null, utmMedium = null, utmCampaign = null, fbc = null, fbp = null, amount = 89.0
 ) => {
   const addressJson = shippingAddress ? JSON.stringify(shippingAddress) : null;
   return await client.execute({
     sql: `INSERT OR IGNORE INTO orders 
-          (id, email, customer_name, phone, shipping_address, status, stripe_pi_id, utm_source, utm_medium, utm_campaign, fbc, fbp) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [id, email, customerName, phone, addressJson, 'confirmed', stripePiId, utmSource, utmMedium, utmCampaign, fbc, fbp]
+          (id, email, customer_name, phone, shipping_address, status, stripe_pi_id, utm_source, utm_medium, utm_campaign, fbc, fbp, amount) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [id, email, customerName, phone, addressJson, 'confirmed', stripePiId, utmSource, utmMedium, utmCampaign, fbc, fbp, amount]
   });
 };
 

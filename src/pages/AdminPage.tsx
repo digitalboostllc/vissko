@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Download, Lock, RefreshCw, LogOut, Package, Euro, TrendingUp } from 'lucide-react'
+import { Download, Lock, RefreshCw, LogOut, Package, Euro } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 
-interface AdminPageProps {
-  onBack: () => void;
-}
+
 
 interface Order {
   id: string;
@@ -15,10 +13,11 @@ interface Order {
   status: string;
   stripe_pi_id: string | null;
   utm_source: string | null;
+  amount?: number;
   created_at: string;
 }
 
-export const AdminPage = ({ onBack }: AdminPageProps) => {
+export const AdminPage = () => {
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
@@ -248,13 +247,6 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-6">
-        <button 
-          onClick={onBack}
-          className="absolute top-6 left-6 p-2 text-zinc-500 hover:text-zinc-900 transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-
         <div className="bg-white p-6 rounded border border-zinc-200 max-w-md w-full flex flex-col gap-6">
           <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-zinc-900" />
@@ -290,9 +282,8 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
 
   // Calculate metrics
   const totalRevenue = orders.reduce((acc, order) => {
-    // Only count completed purchases towards revenue (assuming all 'confirmed' or 'shipped' are paid)
     if (order.status !== 'refunded') {
-      return acc + 89; // Hardcoded 89€ for now, ideally fetch from DB
+      return acc + (order.amount || 89);
     }
     return acc;
   }, 0);
@@ -306,9 +297,6 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-10">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 transition-colors rounded hover:bg-zinc-100">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Logo className="h-5 w-auto text-zinc-900" />
@@ -413,7 +401,7 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
         </div>
 
         {/* Metrics Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
           <div className="bg-white p-6 rounded border border-zinc-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-zinc-500 uppercase">Revenu Total</h3>
@@ -427,14 +415,6 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
               <Package className="w-5 h-5 text-zinc-400" />
             </div>
             <div className="text-3xl font-black text-zinc-900">{ordersToday}</div>
-          </div>
-          <div className="bg-white p-6 rounded border border-zinc-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-zinc-500 uppercase">Taux de Conversion</h3>
-              <TrendingUp className="w-5 h-5 text-zinc-400" />
-            </div>
-            <div className="text-3xl font-black text-zinc-900">3.4%</div>
-            <p className="text-xs text-zinc-400 mt-1">Estimé</p>
           </div>
         </div>
 

@@ -62,7 +62,8 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
 
       // 1. Save to Database
       try {
-        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress, paymentIntentId, utmSource, utmMedium, utmCampaign, fbc, fbp);
+        const amount = session.amount_total ? session.amount_total / 100 : 89.00;
+        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress, paymentIntentId, utmSource, utmMedium, utmCampaign, fbc, fbp, amount);
         console.log(`✅ Order ${shortId} saved to database for ${customerEmail}`);
       } catch (err) {
         console.error('Error saving order to DB:', err);
@@ -489,7 +490,8 @@ app.get('/session-status', async (req, res) => {
 
       // Bulletproof fallback: save order immediately if webhook hasn't fired yet
       try {
-        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress, paymentIntentId, utmSource, utmMedium, utmCampaign, fbc, fbp);
+        const amount = session.amount_total ? session.amount_total / 100 : 89.00;
+        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress, paymentIntentId, utmSource, utmMedium, utmCampaign, fbc, fbp, amount);
         console.log(`✅ Order ${shortId} proactively saved in session-status`);
       } catch (err) {
         console.error('Error saving order proactively:', err);

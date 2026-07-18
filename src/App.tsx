@@ -165,7 +165,7 @@ function App() {
   }
 
   if (currentView === 'admin') {
-    return <AdminPage onBack={goHome} />
+    return <AdminPage />
   }
 
   return (
