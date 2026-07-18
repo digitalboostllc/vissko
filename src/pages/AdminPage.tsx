@@ -14,6 +14,7 @@ interface Order {
   shipping_address: string | null;
   status: string;
   stripe_pi_id: string | null;
+  utm_source: string | null;
   created_at: string;
 }
 
@@ -28,6 +29,10 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
   const [trackingUrl, setTrackingUrl] = useState('')
   const [isShipping, setIsShipping] = useState(false)
   const [isRefunding, setIsRefunding] = useState(false)
+  
+  const [activeTab, setActiveTab] = useState<'orders' | 'settings'>('orders')
+  const [settings, setSettings] = useState({ FB_PIXEL_ID: '', FB_ACCESS_TOKEN: '', GTM_ID: '' })
+  const [isSavingSettings, setIsSavingSettings] = useState(false)
 
   // Check session storage on mount
   useEffect(() => {
@@ -42,22 +47,26 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
     setIsLoading(true)
     setError('')
     try {
-      const response = await fetch(`/api/admin/orders`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      const [ordersRes, settingsRes] = await Promise.all([
+        fetch(`/api/admin/orders`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`/api/admin/settings`, { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Accès refusé. Mot de passe incorrect.')
-        } else {
-          throw new Error(`Erreur serveur (${response.status}). Vérifiez que l'API fonctionne.`)
-        }
+      if (!ordersRes.ok) {
+        if (ordersRes.status === 401) throw new Error('Accès refusé. Mot de passe incorrect.')
+        else throw new Error(`Erreur serveur (${ordersRes.status}).`)
       }
 
-      const data = await response.json()
-      setOrders(data)
+      const ordersData = await ordersRes.json()
+      const settingsData = await settingsRes.json()
+      
+      setOrders(ordersData)
+      setSettings({
+        FB_PIXEL_ID: settingsData.FB_PIXEL_ID || '',
+        FB_ACCESS_TOKEN: settingsData.FB_ACCESS_TOKEN || '',
+        GTM_ID: settingsData.GTM_ID || ''
+      })
+      
       setIsAuthenticated(true)
       sessionStorage.setItem('admin_token', token)
     } catch (err: any) {
@@ -144,6 +153,30 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
       alert('Erreur réseau')
     } finally {
       setIsRefunding(false)
+    }
+  }
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSavingSettings(true)
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${password}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+      })
+      if (response.ok) {
+        alert('Paramètres sauvegardés avec succès !')
+      } else {
+        alert('Erreur lors de la sauvegarde.')
+      }
+    } catch (err) {
+      alert('Erreur réseau.')
+    } finally {
+      setIsSavingSettings(false)
     }
   }
 
@@ -264,9 +297,25 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
             <button onClick={onBack} className="p-2 -ml-2 text-zinc-500 hover:text-zinc-900 transition-colors rounded hover:bg-zinc-100">
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2">
-              <Logo className="h-5 w-auto text-zinc-900" />
-              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest border-l border-zinc-200 pl-2">Admin</span>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <Logo className="h-5 w-auto text-zinc-900" />
+                <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest border-l border-zinc-200 pl-2">Admin</span>
+              </div>
+              <nav className="hidden sm:flex items-center gap-4 border-l border-zinc-200 pl-6">
+                <button 
+                  onClick={() => setActiveTab('orders')}
+                  className={`text-sm font-bold transition-colors ${activeTab === 'orders' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
+                >
+                  Commandes
+                </button>
+                <button 
+                  onClick={() => setActiveTab('settings')}
+                  className={`text-sm font-bold transition-colors ${activeTab === 'settings' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
+                >
+                  Paramètres
+                </button>
+              </nav>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -290,12 +339,60 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
 
       {/* Main Content */}
       <main className="container mx-auto p-6 flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-zinc-900 mb-1">Tableau de bord</h2>
-            <p className="text-sm text-zinc-500">Vue d'ensemble et gestion des expéditions.</p>
+        {activeTab === 'settings' ? (
+          <div className="max-w-2xl">
+            <h2 className="text-2xl font-bold text-zinc-900 mb-1">Paramètres de Tracking</h2>
+            <p className="text-sm text-zinc-500 mb-8">Configurez vos pixels et clés d'API sans toucher au code.</p>
+            
+            <form onSubmit={handleSaveSettings} className="bg-white p-6 rounded border border-zinc-200 flex flex-col gap-6">
+              <div>
+                <label className="block text-sm font-bold text-zinc-900 mb-1">Facebook Pixel ID</label>
+                <input
+                  type="text"
+                  value={settings.FB_PIXEL_ID}
+                  onChange={(e) => setSettings({...settings, FB_PIXEL_ID: e.target.value})}
+                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                  placeholder="e.g. 1387799923415060"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-zinc-900 mb-1">Facebook Conversions API Token</label>
+                <input
+                  type="password"
+                  value={settings.FB_ACCESS_TOKEN}
+                  onChange={(e) => setSettings({...settings, FB_ACCESS_TOKEN: e.target.value})}
+                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                  placeholder="EAAL..."
+                />
+              </div>
+              <hr className="border-zinc-100" />
+              <div>
+                <label className="block text-sm font-bold text-zinc-900 mb-1">Google Tag Manager ID</label>
+                <input
+                  type="text"
+                  value={settings.GTM_ID}
+                  onChange={(e) => setSettings({...settings, GTM_ID: e.target.value})}
+                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                  placeholder="GTM-XXXXXXX"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSavingSettings}
+                className="bg-black text-white font-bold py-3 px-4 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center mt-2"
+              >
+                {isSavingSettings ? <RefreshCw className="w-5 h-5 animate-spin" /> : 'Sauvegarder'}
+              </button>
+            </form>
           </div>
-          <div className="flex items-center gap-3">
+        ) : (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-zinc-900 mb-1">Tableau de bord</h2>
+                <p className="text-sm text-zinc-500">Vue d'ensemble et gestion des expéditions.</p>
+              </div>
+              <div className="flex items-center gap-3">
             <div className="bg-white px-4 py-3 rounded border border-zinc-200 flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
               <span className="text-sm font-bold text-zinc-900">{orders.length} Commandes</span>
@@ -353,6 +450,11 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
                     <tr key={order.id} className="hover:bg-zinc-50 transition-colors">
                       <td className="px-4 py-3 font-mono text-sm font-medium text-zinc-900">
                         {order.id.replace('VSK-', '')}
+                        {order.utm_source && (
+                          <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 uppercase tracking-wider">
+                            {order.utm_source}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm text-zinc-500 whitespace-nowrap">
                         {date}
@@ -425,6 +527,8 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
             </table>
           </div>
         </div>
+        </>
+        )}
       </main>
 
       {/* Shipping Modal */}

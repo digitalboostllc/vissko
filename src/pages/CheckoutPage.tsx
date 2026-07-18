@@ -23,10 +23,27 @@ export const CheckoutPage = ({ onBack, quantity: initialQuantity }: CheckoutPage
 
     try {
       const discount = localStorage.getItem('vissko_coupon');
+      
+      // Extract FB cookies
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+
+      const tracking = {
+        utm_source: localStorage.getItem('utm_source'),
+        utm_medium: localStorage.getItem('utm_medium'),
+        utm_campaign: localStorage.getItem('utm_campaign'),
+        fbc: getCookie('_fbc'),
+        fbp: getCookie('_fbp')
+      };
+
       const res = await fetch('/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: qty, discount })
+        body: JSON.stringify({ quantity: qty, discount, tracking })
       })
       const data = await res.json()
       if (data.clientSecret) {

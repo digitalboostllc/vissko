@@ -41,6 +41,50 @@ function App() {
   const navigateTo = (view: ViewState) => setCurrentView(view)
 
   useEffect(() => {
+    // UTM Capture
+    const params = new URLSearchParams(window.location.search)
+    const utmSource = params.get('utm_source')
+    const utmMedium = params.get('utm_medium')
+    const utmCampaign = params.get('utm_campaign')
+    
+    if (utmSource) localStorage.setItem('utm_source', utmSource)
+    if (utmMedium) localStorage.setItem('utm_medium', utmMedium)
+    if (utmCampaign) localStorage.setItem('utm_campaign', utmCampaign)
+
+    // Fetch Tracking IDs
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(settings => {
+        if (settings.FB_PIXEL_ID) {
+          const script = document.createElement('script')
+          script.innerHTML = `
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '${settings.FB_PIXEL_ID}');
+            fbq('track', 'PageView');
+          `
+          document.head.appendChild(script)
+        }
+        if (settings.GTM_ID) {
+          const script = document.createElement('script')
+          script.innerHTML = `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${settings.GTM_ID}');
+          `
+          document.head.appendChild(script)
+        }
+      })
+      .catch(console.error)
+
     const schema = {
       "@context": "https://schema.org/",
       "@type": "Product",

@@ -7,14 +7,16 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN || '',
 });
 
-// Table 'orders' must be created manually or via init scripts.
-// The schema is: id (TEXT), email (TEXT), status (TEXT), created_at (DATETIME)
-
-export const saveOrder = async (id, email, customerName = null, phone = null, shippingAddress = null, stripePiId = null) => {
+export const saveOrder = async (
+  id, email, customerName = null, phone = null, shippingAddress = null, stripePiId = null,
+  utmSource = null, utmMedium = null, utmCampaign = null, fbc = null, fbp = null
+) => {
   const addressJson = shippingAddress ? JSON.stringify(shippingAddress) : null;
   return await client.execute({
-    sql: 'INSERT OR IGNORE INTO orders (id, email, customer_name, phone, shipping_address, status, stripe_pi_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    args: [id, email, customerName, phone, addressJson, 'confirmed', stripePiId]
+    sql: `INSERT OR IGNORE INTO orders 
+          (id, email, customer_name, phone, shipping_address, status, stripe_pi_id, utm_source, utm_medium, utm_campaign, fbc, fbp) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [id, email, customerName, phone, addressJson, 'confirmed', stripePiId, utmSource, utmMedium, utmCampaign, fbc, fbp]
   });
 };
 
@@ -56,6 +58,30 @@ export const updateOrderStatusByPiId = async (piId, status) => {
     sql: 'UPDATE orders SET status = ? WHERE stripe_pi_id = ?',
     args: [status, piId]
   });
+};
+
+export const getSetting = async (key) => {
+  const result = await client.execute({
+    sql: 'SELECT value FROM settings WHERE key = ?',
+    args: [key]
+  });
+  return result.rows[0]?.value || null;
+};
+
+export const setSetting = async (key, value) => {
+  return await client.execute({
+    sql: 'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+    args: [key, value]
+  });
+};
+
+export const getAllSettings = async () => {
+  const result = await client.execute('SELECT * FROM settings');
+  const settings = {};
+  result.rows.forEach(row => {
+    settings[row.key] = row.value;
+  });
+  return settings;
 };
 
 export default client;

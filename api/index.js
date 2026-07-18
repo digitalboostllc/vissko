@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import crypto from 'crypto';
-import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail, updateOrderStatusById, updateOrderStatusByPiId } from './db.js';
+import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail, updateOrderStatusById, updateOrderStatusByPiId, getSetting, setSetting, getAllSettings } from './db.js';
 
 dotenv.config();
 
@@ -50,10 +50,19 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
     if (customerEmail) {
       const shortId = 'VSK-' + orderId.slice(-8).toUpperCase();
       const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
+      const metadata = typeof session.payment_intent === 'object' && session.payment_intent?.metadata ? session.payment_intent.metadata : session.metadata || {};
+
+      const utmSource = metadata.utm_source || null;
+      const utmMedium = metadata.utm_medium || null;
+      const utmCampaign = metadata.utm_campaign || null;
+      const fbc = metadata.fbc || null;
+      const fbp = metadata.fbp || null;
+      const clientIp = metadata.client_ip_address || null;
+      const clientUserAgent = metadata.client_user_agent || null;
 
       // 1. Save to Database
       try {
-        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress, paymentIntentId);
+        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress, paymentIntentId, utmSource, utmMedium, utmCampaign, fbc, fbp);
         console.log(`✅ Order ${shortId} saved to database for ${customerEmail}`);
       } catch (err) {
         console.error('Error saving order to DB:', err);
@@ -99,11 +108,24 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
 
       // 3. Send Facebook CAPI Purchase Event
       try {
-        const pixelId = process.env.FB_PIXEL_ID;
-        const accessToken = process.env.FB_ACCESS_TOKEN;
+        const pixelId = await getSetting('FB_PIXEL_ID');
+        const accessToken = await getSetting('FB_ACCESS_TOKEN');
         
         if (pixelId && accessToken && customerEmail) {
           const hashEmail = crypto.createHash('sha256').update(customerEmail.toLowerCase().trim()).digest('hex');
+          const userData = { em: [hashEmail] };
+          
+          if (phone) {
+             const hashPhone = crypto.createHash('sha256').update(phone.replace(/\D/g,'')).digest('hex');
+             userData.ph = [hashPhone];
+          }
+          if (fbc) userData.fbc = fbc;
+          if (fbp) userData.fbp = fbp;
+          if (clientIp) userData.client_ip_address = clientIp;
+          if (clientUserAgent) userData.client_user_agent = clientUserAgent;
+          if (shippingAddress && shippingAddress.postal_code) {
+             userData.zp = [crypto.createHash('sha256').update(shippingAddress.postal_code.trim().toLowerCase()).digest('hex')];
+          }
 
           await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events`, {
             method: 'POST',
@@ -116,9 +138,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
                   event_name: 'Purchase',
                   event_time: Math.floor(Date.now() / 1000),
                   action_source: 'website',
-                  user_data: {
-                    em: [hashEmail]
-                  },
+                  user_data: userData,
                   custom_data: {
                     currency: 'EUR',
                     value: 89.00
@@ -193,16 +213,32 @@ app.use(express.json());
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const quantity = parseInt(req.body.quantity, 10) || 1;
-    // Extract discount coupon from body
     const discount = req.body.discount;
+    const tracking = req.body.tracking || {};
     const currentDomain = req.headers.origin || process.env.DOMAIN || 'http://localhost:5173';
+
+    // Capture IP from request for CAPI
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
+    const metadata = {
+      utm_source: tracking.utm_source || '',
+      utm_medium: tracking.utm_medium || '',
+      utm_campaign: tracking.utm_campaign || '',
+      fbc: tracking.fbc || '',
+      fbp: tracking.fbp || '',
+      client_ip_address: clientIp || '',
+      client_user_agent: userAgent || ''
+    };
 
     const sessionParams = {
       ui_mode: 'embedded',
       customer_creation: 'always', // Required for 1-click upsells
       payment_intent_data: {
         setup_future_usage: 'on_session',
+        metadata: metadata
       },
+      metadata: metadata,
       expires_at: Math.floor(Date.now() / 1000) + (30 * 60), // Expire in 30 mins for Abandoned Cart recovery
       line_items: [
         {
@@ -303,6 +339,52 @@ app.get('/api/tracking/:orderId', async (req, res) => {
   }
 });
 
+// Public Settings Endpoint
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await getAllSettings();
+    // Only return non-sensitive settings to public frontend
+    res.send({
+      FB_PIXEL_ID: settings.FB_PIXEL_ID || null,
+      GTM_ID: settings.GTM_ID || null,
+    });
+  } catch (err) {
+    console.error('Error fetching settings:', err);
+    res.status(500).send({ error: 'Database error' });
+  }
+});
+
+// Admin Settings Endpoint
+app.get('/api/admin/settings', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+  try {
+    const settings = await getAllSettings();
+    res.send(settings);
+  } catch (err) {
+    res.status(500).send({ error: 'Database error' });
+  }
+});
+
+app.post('/api/admin/settings', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+  try {
+    const updates = req.body; // e.g. { FB_PIXEL_ID: '...', FB_ACCESS_TOKEN: '...' }
+    for (const [key, value] of Object.entries(updates)) {
+      await setSetting(key, value);
+    }
+    res.send({ success: true });
+  } catch (err) {
+    console.error('Error updating settings:', err);
+    res.status(500).send({ error: 'Database error' });
+  }
+});
+
 // Admin API Endpoint (Protected by hardcoded token)
 app.get('/api/admin/orders', async (req, res) => {
   const authHeader = req.headers.authorization;
@@ -397,9 +479,17 @@ app.get('/session-status', async (req, res) => {
       const phone = session.customer_details?.phone || null;
       const shippingAddress = session.shipping_details?.address || null;
       const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
+      
+      const metadata = typeof session.payment_intent === 'object' && session.payment_intent?.metadata ? session.payment_intent.metadata : session.metadata || {};
+      const utmSource = metadata.utm_source || null;
+      const utmMedium = metadata.utm_medium || null;
+      const utmCampaign = metadata.utm_campaign || null;
+      const fbc = metadata.fbc || null;
+      const fbp = metadata.fbp || null;
+
       // Bulletproof fallback: save order immediately if webhook hasn't fired yet
       try {
-        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress, paymentIntentId);
+        await saveOrder(shortId, session.customer_details.email, customerName, phone, shippingAddress, paymentIntentId, utmSource, utmMedium, utmCampaign, fbc, fbp);
         console.log(`✅ Order ${shortId} proactively saved in session-status`);
       } catch (err) {
         console.error('Error saving order proactively:', err);
