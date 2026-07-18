@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
+import crypto from 'crypto';
 import { saveOrder, getOrder, getAllOrders } from './db.js';
 
 dotenv.config();
@@ -93,6 +94,43 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
         console.log(`📧 Order confirmation email sent to ${customerEmail}`);
       } catch (err) {
         console.error('Error sending email via Resend:', err);
+      }
+
+      // 3. Send Facebook CAPI Purchase Event
+      try {
+        const pixelId = process.env.FB_PIXEL_ID;
+        const accessToken = process.env.FB_ACCESS_TOKEN;
+        
+        if (pixelId && accessToken && customerEmail) {
+          const hashEmail = crypto.createHash('sha256').update(customerEmail.toLowerCase().trim()).digest('hex');
+
+          await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              data: [
+                {
+                  event_name: 'Purchase',
+                  event_time: Math.floor(Date.now() / 1000),
+                  action_source: 'website',
+                  user_data: {
+                    em: [hashEmail]
+                  },
+                  custom_data: {
+                    currency: 'EUR',
+                    value: 89.00
+                  }
+                }
+              ],
+              access_token: accessToken
+            })
+          });
+          console.log(`🎯 Server-side Purchase event sent for ${shortId}`);
+        }
+      } catch (err) {
+        console.error('Error sending CAPI event:', err);
       }
     }
   }

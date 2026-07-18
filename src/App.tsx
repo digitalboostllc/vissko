@@ -20,6 +20,7 @@ import { CGVPage } from '@/pages/CGVPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { SuccessPage } from '@/pages/SuccessPage'
 import { AdminPage } from '@/pages/AdminPage'
+import { trackEvent } from '@/lib/tracking'
 
 type ViewState = 'landing' | 'checkout' | 'tracking' | 'cgv' | 'privacy' | 'success' | 'admin'
 
@@ -27,7 +28,10 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewState>('landing')
   const [hasShownExitIntent, setHasShownExitIntent] = useState(false)
 
-  const openCheckout = () => setCurrentView('checkout')
+  const openCheckout = () => {
+    trackEvent('InitiateCheckout')
+    setCurrentView('checkout')
+  }
   const goHome = () => setCurrentView('landing')
   const openTracking = () => setCurrentView('tracking')
   const navigateTo = (view: ViewState) => setCurrentView(view)
@@ -36,6 +40,7 @@ function App() {
     // Check if we are returning from Stripe checkout
     if (window.location.pathname === '/return') {
       setCurrentView('success')
+      trackEvent('Purchase', { value: 89.00, currency: 'EUR' })
     } else if (window.location.pathname === '/admin') {
       setCurrentView('admin')
     }
