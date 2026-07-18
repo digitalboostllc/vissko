@@ -15,8 +15,7 @@ export const Hero = ({ onBuyClick }: HeroProps) => {
     // Fetch live stock from backend
     const fetchStock = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4242'
-        const res = await fetch(`${apiUrl}/api/stock`)
+        const res = await fetch(`/api/stock`)
         if (res.ok) {
           const data = await res.json()
           if (data.stock) {

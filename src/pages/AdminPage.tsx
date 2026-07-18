@@ -35,8 +35,7 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
     setIsLoading(true)
     setError('')
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4242'
-      const response = await fetch(`${apiUrl}/api/admin/orders`, {
+      const response = await fetch(`/api/admin/orders`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

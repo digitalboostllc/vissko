@@ -19,11 +19,10 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
   const handleUpsell = async () => {
     setIsUpsellLoading(true)
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4242'
       const queryString = window.location.search
       const urlParams = new URLSearchParams(queryString)
       
-      const response = await fetch(`${apiUrl}/create-upsell-checkout-session`, {
+      const response = await fetch(`/create-upsell-checkout-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ original_session_id: urlParams.get('session_id') })
