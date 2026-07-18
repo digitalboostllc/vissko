@@ -21,6 +21,7 @@ interface Order {
 export const AdminPage = ({ onBack }: AdminPageProps) => {
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
   const [error, setError] = useState('')
   const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -40,6 +41,8 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
     if (savedPassword) {
       setPassword(savedPassword)
       fetchOrders(savedPassword)
+    } else {
+      setIsInitializing(false)
     }
   }, [])
 
@@ -75,6 +78,7 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
       sessionStorage.removeItem('admin_token')
     } finally {
       setIsLoading(false)
+      setIsInitializing(false)
     }
   }
 
@@ -231,6 +235,14 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <RefreshCw className="w-8 h-8 text-zinc-300 animate-spin" />
+      </div>
+    )
   }
 
   if (!isAuthenticated) {
