@@ -1,7 +1,4 @@
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Star, CheckCircle, MapPin } from 'lucide-react'
-
 const testimonials = [
   {
     name: "Sophie M.",
@@ -69,6 +66,7 @@ export const SocialProof = () => {
             </div>
           ))}
         </div>
+      </div>
     </section>
   )
 }
