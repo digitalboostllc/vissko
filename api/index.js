@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
-import { saveOrder, getOrder } from './db.js';
+import { saveOrder, getOrder, getAllOrders } from './db.js';
 
 dotenv.config();
 
@@ -161,6 +161,22 @@ app.get('/api/tracking/:orderId', async (req, res) => {
     }
   } catch (error) {
     console.error('Error fetching order from Turso:', error);
+    res.status(500).send({ error: 'Database error' });
+  }
+});
+
+// Admin API Endpoint (Protected by hardcoded token)
+app.get('/api/admin/orders', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+
+  try {
+    const orders = await getAllOrders();
+    res.send(orders);
+  } catch (error) {
+    console.error('Error fetching all orders from Turso:', error);
     res.status(500).send({ error: 'Database error' });
   }
 });

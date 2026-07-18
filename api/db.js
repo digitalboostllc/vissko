@@ -27,4 +27,9 @@ export const getOrder = async (id, email) => {
   return result.rows[0];
 };
 
+export const getAllOrders = async () => {
+  const result = await client.execute('SELECT * FROM orders ORDER BY created_at DESC');
+  return result.rows;
+};
+
 export default client;

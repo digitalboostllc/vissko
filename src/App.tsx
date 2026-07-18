@@ -19,8 +19,9 @@ import { TrackingPage } from '@/pages/TrackingPage'
 import { CGVPage } from '@/pages/CGVPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { SuccessPage } from '@/pages/SuccessPage'
+import { AdminPage } from '@/pages/AdminPage'
 
-type ViewState = 'landing' | 'checkout' | 'tracking' | 'cgv' | 'privacy' | 'success'
+type ViewState = 'landing' | 'checkout' | 'tracking' | 'cgv' | 'privacy' | 'success' | 'admin'
 
 function App() {
   const [currentView, setCurrentView] = useState<ViewState>('landing')
@@ -35,6 +36,8 @@ function App() {
     // Check if we are returning from Stripe checkout
     if (window.location.pathname === '/return') {
       setCurrentView('success')
+    } else if (window.location.pathname === '/admin') {
+      setCurrentView('admin')
     }
 
     // Expose openTracking globally so the Header can call it
@@ -71,6 +74,10 @@ function App() {
 
   if (currentView === 'success') {
     return <SuccessPage onGoHome={goHome} onTrackOrder={openTracking} />
+  }
+
+  if (currentView === 'admin') {
+    return <AdminPage onBack={goHome} />
   }
 
   return (
