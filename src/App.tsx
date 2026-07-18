@@ -34,7 +34,18 @@ function App() {
   const openCheckout = (qty: any = 1) => {
     const finalQty = typeof qty === 'number' ? qty : 1;
     setCheckoutQty(finalQty)
-    trackEvent('InitiateCheckout')
+    
+    let val = 89.00;
+    if (finalQty === 2) val = 142.00;
+    if (finalQty === 3) val = 186.00;
+    
+    trackEvent('InitiateCheckout', {
+      value: val,
+      currency: 'EUR',
+      num_items: finalQty,
+      content_ids: ['vissko_fan'],
+      content_type: 'product'
+    })
     setCurrentView('checkout')
   }
   const goHome = () => setCurrentView('landing')
@@ -70,6 +81,7 @@ function App() {
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${settings.FB_PIXEL_ID}');
             fbq('track', 'PageView');
+            fbq('track', 'ViewContent', { content_ids: ['vissko_fan'], content_type: 'product', value: 89.00, currency: 'EUR' });
           `
           document.head.appendChild(script)
         }
