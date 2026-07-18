@@ -379,13 +379,13 @@ export const AdminPage = ({ onBack }: AdminPageProps) => {
               </div>
               <hr className="border-zinc-100" />
               <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-1">Google Tag Manager ID</label>
+                <label className="block text-sm font-bold text-zinc-900 mb-1">Google Analytics (GA4) ID</label>
                 <input
                   type="text"
                   value={settings.GTM_ID}
                   onChange={(e) => setSettings({...settings, GTM_ID: e.target.value})}
                   className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                  placeholder="GTM-XXXXXXX"
+                  placeholder="e.g. G-RHM7G3ZCPG"
                 />
               </div>
               <button

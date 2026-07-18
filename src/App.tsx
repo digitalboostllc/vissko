@@ -72,15 +72,20 @@ function App() {
           document.head.appendChild(script)
         }
         if (settings.GTM_ID) {
-          const script = document.createElement('script')
-          script.innerHTML = `
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${settings.GTM_ID}');
+          // Google Analytics 4 (gtag.js)
+          const script1 = document.createElement('script')
+          script1.async = true
+          script1.src = `https://www.googletagmanager.com/gtag/js?id=${settings.GTM_ID}`
+          document.head.appendChild(script1)
+
+          const script2 = document.createElement('script')
+          script2.innerHTML = `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${settings.GTM_ID}');
           `
-          document.head.appendChild(script)
+          document.head.appendChild(script2)
         }
       })
       .catch(console.error)
