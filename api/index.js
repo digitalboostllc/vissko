@@ -49,9 +49,17 @@ if (!ADMIN_PASSWORD && process.env.NODE_ENV === 'production') {
   process.exit(1);
 }
 
-const requireAdmin = (req, res, next) => {
+const requireAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  const expectedToken = `Bearer ${ADMIN_PASSWORD || 'vissko_admin_2026'}`;
+  
+  let dbPassword;
+  try {
+    dbPassword = await getSetting('ADMIN_PASSWORD');
+  } catch (err) {
+    console.error("DB error fetching admin password", err);
+  }
+  
+  const expectedToken = `Bearer ${dbPassword || ADMIN_PASSWORD || 'vissko_admin_2026'}`;
   
   if (!authHeader || authHeader !== expectedToken) {
     return res.status(401).send({ error: 'Unauthorized' });
@@ -114,8 +122,9 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
         console.error('Error saving order to DB:', err);
       }
 
-      // 2. Send Order Confirmation Email via Resend
-      try {
+      if (session.payment_status === 'paid') {
+        // 2. Send Order Confirmation Email via Resend
+        try {
         await resend.emails.send({
           from: 'Vissko <orders@vissko.us>', // Requires verified domain in Resend
           to: customerEmail,
@@ -207,13 +216,19 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
           const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
           const quantity = lineItems?.data?.[0]?.quantity || 1;
           
-          // Call AliExpress API asynchronously
-          placeAliExpressOrder(shortId, shippingAddress, customerName, phone, quantity)
-            .catch(err => console.error('AliExpress Fulfillment Promise Error:', err));
+          // Call AliExpress API synchronously to handle failure properly
+          const aeResult = await placeAliExpressOrder(shortId, shippingAddress, customerName, phone, quantity);
+          if (!aeResult.success) {
+             await updateOrderStatusById(shortId, 'action_required');
+             console.error(`🚨 AliExpress fulfillment failed for ${shortId}. Marked as action_required.`);
+          }
         }
       } catch (err) {
         console.error('Error initiating AliExpress fulfillment:', err);
+        await updateOrderStatusById(shortId, 'action_required');
       }
+    } else {
+      console.log(`⚠️ Order ${shortId} saved but payment_status is '${session.payment_status}'. Skipping fulfillment.`);
     }
   } else if (event.type === 'charge.refunded') {
     const charge = event.data.object;
@@ -413,8 +428,11 @@ app.post('/api/one-click-upsell', async (req, res) => {
 
       // 3. Trigger AliExpress
       if (shippingAddress) {
-        placeAliExpressOrder(shortId, shippingAddress, customerName, phone, 1)
-          .catch(err => console.error('AliExpress Upsell Fulfillment Error:', err));
+        const aeResult = await placeAliExpressOrder(shortId, shippingAddress, customerName, phone, 1);
+        if (!aeResult.success) {
+           await updateOrderStatusById(shortId, 'action_required');
+           console.error(`🚨 AliExpress fulfillment failed for upsell ${shortId}. Marked as action_required.`);
+        }
       }
     }
 

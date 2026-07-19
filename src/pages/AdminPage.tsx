@@ -39,7 +39,8 @@ export const AdminPage = () => {
     ALIEXPRESS_APP_SECRET: '',
     ALIEXPRESS_ACCESS_TOKEN: '',
     ALIEXPRESS_PRODUCT_ID: '',
-    ALIEXPRESS_SKU_ID: ''
+    ALIEXPRESS_SKU_ID: '',
+    ADMIN_PASSWORD: ''
   })
   const [isSavingSettings, setIsSavingSettings] = useState(false)
 
@@ -80,7 +81,8 @@ export const AdminPage = () => {
         ALIEXPRESS_APP_SECRET: settingsData.ALIEXPRESS_APP_SECRET || '',
         ALIEXPRESS_ACCESS_TOKEN: settingsData.ALIEXPRESS_ACCESS_TOKEN || '',
         ALIEXPRESS_PRODUCT_ID: settingsData.ALIEXPRESS_PRODUCT_ID || '',
-        ALIEXPRESS_SKU_ID: settingsData.ALIEXPRESS_SKU_ID || ''
+        ALIEXPRESS_SKU_ID: settingsData.ALIEXPRESS_SKU_ID || '',
+        ADMIN_PASSWORD: settingsData.ADMIN_PASSWORD || ''
       })
       
       setIsAuthenticated(true)
@@ -464,6 +466,25 @@ export const AdminPage = () => {
                 </div>
               </div>
 
+              {/* Security Bento */}
+              <div className="bg-white p-6 rounded border border-zinc-200 flex flex-col gap-6 lg:col-span-2 max-w-xl">
+                <div>
+                  <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-widest mb-6">Accès & Sécurité</h3>
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Mot de Passe Admin</label>
+                      <input
+                        type="password"
+                        value={settings.ADMIN_PASSWORD}
+                        onChange={(e) => setSettings({...settings, ADMIN_PASSWORD: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="Nouveau mot de passe"
+                      />
+                      <p className="text-xs text-zinc-500 mt-2">Ce mot de passe protège l'accès à ce tableau de bord. Si vous le modifiez, vous devrez vous reconnecter.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
               {/* Save Button spanning full width */}
               <div className="lg:col-span-2 flex justify-end mt-2">
                 <button
