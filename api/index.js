@@ -16,9 +16,55 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder');
 
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
 const app = express();
-app.use(cors());
+
+// 1. Security Headers
+app.use(helmet());
+
+// 2. Strict CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:4242',
+  process.env.DOMAIN || 'https://vissko.us'
+];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(express.static('public'));
+
+// 3. Admin Authentication Middleware
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD && process.env.NODE_ENV === 'production') {
+  console.error("CRITICAL: ADMIN_PASSWORD is not set in production. Security risk!");
+  process.exit(1);
+}
+
+const requireAdmin = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const expectedToken = `Bearer ${ADMIN_PASSWORD || 'vissko_admin_2026'}`;
+  
+  if (!authHeader || authHeader !== expectedToken) {
+    return res.status(401).send({ error: 'Unauthorized' });
+  }
+  next();
+};
+
+// 4. Rate Limiter for Admin Endpoints
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // Limit each IP to 50 requests per window
+  message: { error: 'Too many requests from this IP, please try again later.' }
+});
 
 // IMPORTANT: Webhook must use express.raw before express.json()
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -28,12 +74,10 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
   let event;
 
   try {
-    if (endpointSecret) {
-      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-    } else {
-      // For local testing without a webhook secret
-      event = JSON.parse(request.body.toString());
+    if (!endpointSecret) {
+      throw new Error("CRITICAL SECURITY RISK: STRIPE_WEBHOOK_SECRET is missing. Rejecting payload to prevent spoofed order fulfillment.");
     }
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
   } catch (err) {
     console.log(`⚠️  Webhook Error: ${err.message}`);
     return response.status(400).send(`Webhook Error: ${err.message}`);
@@ -372,11 +416,7 @@ app.get('/api/settings', async (req, res) => {
 });
 
 // Admin Settings Endpoint
-app.get('/api/admin/settings', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
+app.get('/api/admin/settings', adminLimiter, requireAdmin, async (req, res) => {
   try {
     const settings = await getAllSettings();
     res.send(settings);
@@ -385,11 +425,7 @@ app.get('/api/admin/settings', async (req, res) => {
   }
 });
 
-app.post('/api/admin/settings', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
+app.post('/api/admin/settings', adminLimiter, requireAdmin, async (req, res) => {
   try {
     const updates = req.body; // e.g. { FB_PIXEL_ID: '...', FB_ACCESS_TOKEN: '...' }
     for (const [key, value] of Object.entries(updates)) {
@@ -402,12 +438,8 @@ app.post('/api/admin/settings', async (req, res) => {
   }
 });
 
-// Admin API Endpoint (Protected by hardcoded token)
-app.get('/api/admin/orders', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
+// Admin API Endpoint (Protected)
+app.get('/api/admin/orders', adminLimiter, requireAdmin, async (req, res) => {
 
   try {
     const orders = await getAllOrders();
@@ -419,11 +451,7 @@ app.get('/api/admin/orders', async (req, res) => {
 });
 
 // Admin Shipping Endpoint
-app.put('/api/admin/orders/:id', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
+app.put('/api/admin/orders/:id', adminLimiter, requireAdmin, async (req, res) => {
 
   const { id } = req.params;
   const { status, tracking_url, email } = req.body;
@@ -455,11 +483,7 @@ app.put('/api/admin/orders/:id', async (req, res) => {
 });
 
 // Admin Refund Endpoint
-app.post('/api/admin/orders/:id/refund', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || authHeader !== 'Bearer vissko_admin_2026') {
-    return res.status(401).send({ error: 'Unauthorized' });
-  }
+app.post('/api/admin/orders/:id/refund', adminLimiter, requireAdmin, async (req, res) => {
 
   const { id } = req.params;
   const { stripe_pi_id } = req.body;
