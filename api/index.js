@@ -451,7 +451,7 @@ app.post('/api/one-click-upsell', async (req, res) => {
                 {
                   event_name: 'Purchase',
                   event_time: Math.floor(Date.now() / 1000),
-                  event_id: paymentIntent.id,
+                  event_id: original_session_id + '_upsell',
                   action_source: 'website',
                   user_data: userData,
                   custom_data: { currency: 'EUR', value: 53.40 }
