@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { Resend } from 'resend';
 import crypto from 'crypto';
 import { saveOrder, getOrder, getAllOrders, getOrderCount, updateOrderStatusByEmail, updateOrderStatusById, updateOrderStatusByPiId, getSetting, setSetting, getAllSettings } from './db.js';
+import { placeAliExpressOrder } from './aliexpress.js';
 
 dotenv.config();
 
@@ -153,6 +154,21 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
         }
       } catch (err) {
         console.error('Error sending CAPI event:', err);
+      }
+
+      // 4. Auto-Fulfill to AliExpress
+      try {
+        if (shippingAddress) {
+          // Fetch line items to get exact quantity
+          const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+          const quantity = lineItems?.data?.[0]?.quantity || 1;
+          
+          // Call AliExpress API asynchronously
+          placeAliExpressOrder(shortId, shippingAddress, customerName, phone, quantity)
+            .catch(err => console.error('AliExpress Fulfillment Promise Error:', err));
+        }
+      } catch (err) {
+        console.error('Error initiating AliExpress fulfillment:', err);
       }
     }
   } else if (event.type === 'charge.refunded') {

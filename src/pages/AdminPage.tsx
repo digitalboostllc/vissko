@@ -31,7 +31,16 @@ export const AdminPage = () => {
   const [isRefunding, setIsRefunding] = useState(false)
   
   const [activeTab, setActiveTab] = useState<'orders' | 'settings'>('orders')
-  const [settings, setSettings] = useState({ FB_PIXEL_ID: '', FB_ACCESS_TOKEN: '', GTM_ID: '' })
+  const [settings, setSettings] = useState({ 
+    FB_PIXEL_ID: '', 
+    FB_ACCESS_TOKEN: '', 
+    GTM_ID: '',
+    ALIEXPRESS_APP_KEY: '',
+    ALIEXPRESS_APP_SECRET: '',
+    ALIEXPRESS_ACCESS_TOKEN: '',
+    ALIEXPRESS_PRODUCT_ID: '',
+    ALIEXPRESS_SKU_ID: ''
+  })
   const [isSavingSettings, setIsSavingSettings] = useState(false)
 
   // Check session storage on mount
@@ -66,7 +75,12 @@ export const AdminPage = () => {
       setSettings({
         FB_PIXEL_ID: settingsData.FB_PIXEL_ID || '',
         FB_ACCESS_TOKEN: settingsData.FB_ACCESS_TOKEN || '',
-        GTM_ID: settingsData.GTM_ID || ''
+        GTM_ID: settingsData.GTM_ID || '',
+        ALIEXPRESS_APP_KEY: settingsData.ALIEXPRESS_APP_KEY || '',
+        ALIEXPRESS_APP_SECRET: settingsData.ALIEXPRESS_APP_SECRET || '',
+        ALIEXPRESS_ACCESS_TOKEN: settingsData.ALIEXPRESS_ACCESS_TOKEN || '',
+        ALIEXPRESS_PRODUCT_ID: settingsData.ALIEXPRESS_PRODUCT_ID || '',
+        ALIEXPRESS_SKU_ID: settingsData.ALIEXPRESS_SKU_ID || ''
       })
       
       setIsAuthenticated(true)
@@ -375,6 +389,66 @@ export const AdminPage = () => {
                   className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
                   placeholder="e.g. G-RHM7G3ZCPG"
                 />
+              </div>
+
+              <hr className="border-zinc-100" />
+              <h3 className="text-lg font-bold text-zinc-900 mb-2 mt-4">AliExpress Dropshipping API</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-zinc-900 mb-1">App Key</label>
+                  <input
+                    type="text"
+                    value={settings.ALIEXPRESS_APP_KEY}
+                    onChange={(e) => setSettings({...settings, ALIEXPRESS_APP_KEY: e.target.value})}
+                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                    placeholder="App Key"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-zinc-900 mb-1">App Secret</label>
+                  <input
+                    type="password"
+                    value={settings.ALIEXPRESS_APP_SECRET}
+                    onChange={(e) => setSettings({...settings, ALIEXPRESS_APP_SECRET: e.target.value})}
+                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                    placeholder="App Secret"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-zinc-900 mb-1">Access Token</label>
+                <input
+                  type="password"
+                  value={settings.ALIEXPRESS_ACCESS_TOKEN}
+                  onChange={(e) => setSettings({...settings, ALIEXPRESS_ACCESS_TOKEN: e.target.value})}
+                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                  placeholder="Paste your 30-day AliExpress Access Token here"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-zinc-900 mb-1">Product ID</label>
+                  <input
+                    type="text"
+                    value={settings.ALIEXPRESS_PRODUCT_ID}
+                    onChange={(e) => setSettings({...settings, ALIEXPRESS_PRODUCT_ID: e.target.value})}
+                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                    placeholder="e.g. 100500..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-zinc-900 mb-1">SKU ID (Optional)</label>
+                  <input
+                    type="text"
+                    value={settings.ALIEXPRESS_SKU_ID}
+                    onChange={(e) => setSettings({...settings, ALIEXPRESS_SKU_ID: e.target.value})}
+                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
+                    placeholder="e.g. 14:193;380:201441007"
+                  />
+                </div>
               </div>
               <button
                 type="submit"
