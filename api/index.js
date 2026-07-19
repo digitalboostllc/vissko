@@ -578,9 +578,35 @@ app.get('/api/admin/analytics', adminLimiter, requireAdmin, async (req, res) => 
     if (adAccountId && accessToken) {
       // Fetch Facebook Ads Insights
       const fbResponse = await fetch(`https://graph.facebook.com/v19.0/${adAccountId}/insights?level=campaign&fields=campaign_name,spend,actions,outbound_clicks,cpm,cpp,cpc&date_preset=maximum&access_token=${accessToken}`);
+      
       if (fbResponse.ok) {
         const fbData = await fbResponse.json();
-        fbInsights = fbData.data || [];
+        let rawInsights = fbData.data || [];
+
+        // Fetch Live Exchange Rates (EUR base)
+        try {
+          const fxResponse = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
+          const fxData = await fxResponse.json();
+          const idrRate = fxData.rates?.IDR || 17600; // Fallback to ~17600 if API fails
+
+          // Convert IDR to EUR
+          fbInsights = rawInsights.map(campaign => ({
+            ...campaign,
+            spend: (parseFloat(campaign.spend || '0') / idrRate).toFixed(2),
+            cpc: (parseFloat(campaign.cpc || '0') / idrRate).toFixed(2),
+            cpm: (parseFloat(campaign.cpm || '0') / idrRate).toFixed(2)
+          }));
+        } catch (fxErr) {
+          console.error('Failed to fetch exchange rates', fxErr);
+          // Fallback static conversion if network fails
+          fbInsights = rawInsights.map(campaign => ({
+            ...campaign,
+            spend: (parseFloat(campaign.spend || '0') / 17600).toFixed(2),
+            cpc: (parseFloat(campaign.cpc || '0') / 17600).toFixed(2),
+            cpm: (parseFloat(campaign.cpm || '0') / 17600).toFixed(2)
+          }));
+        }
+
       } else {
         console.error('FB API Error:', await fbResponse.text());
       }
