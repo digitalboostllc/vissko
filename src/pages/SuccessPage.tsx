@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle2, Package, ArrowRight, RefreshCw, XCircle, Gift, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/Logo'
+import { trackEvent } from '@/lib/tracking'
 
 interface SuccessPageProps {
   onGoHome: () => void;
@@ -13,6 +14,7 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
   const [status, setStatus] = useState<string | null>(null)
   const [customerEmail, setCustomerEmail] = useState<string | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpsellLoading, setIsUpsellLoading] = useState(false)
   const [upsellSuccess, setUpsellSuccess] = useState(false)
@@ -20,10 +22,12 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
   const handleUpsell = async () => {
     setIsUpsellLoading(true)
     try {
-      const queryString = window.location.search
-      const urlParams = new URLSearchParams(queryString)
-      const sessionId = urlParams.get('session_id')
+      const sessionId = activeSessionId;
       
+      if (!sessionId) {
+        throw new Error('Session ID is missing');
+      }
+
       const response = await fetch('/api/one-click-upsell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,6 +37,7 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
       
       if (data.success) {
         setUpsellSuccess(true)
+        trackEvent('Purchase', { value: 53.40, currency: 'EUR', event_id: sessionId + '_upsell' })
       } else {
         console.error('Upsell failed:', data.error)
         alert('Impossible de traiter la demande avec le moyen de paiement enregistré.')
@@ -57,6 +62,8 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
       return
     }
 
+    setActiveSessionId(sessionId)
+
     fetch(`/session-status?session_id=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -65,6 +72,10 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
         setOrderId(data.order_id)
         setIsLoading(false)
         
+        if (data.status === 'complete') {
+          trackEvent('Purchase', { value: data.amount_total || 89.00, currency: 'EUR', event_id: sessionId })
+        }
+
         // Clean up the URL so it looks nicer
         window.history.replaceState({}, document.title, "/")
       })

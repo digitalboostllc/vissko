@@ -2,7 +2,11 @@ export const trackEvent = (eventName: string, data?: any) => {
   if (typeof window !== 'undefined') {
     // Facebook Pixel
     if ((window as any).fbq) {
-      (window as any).fbq('track', eventName, data);
+      if (data?.event_id) {
+        (window as any).fbq('track', eventName, data, { eventID: data.event_id });
+      } else {
+        (window as any).fbq('track', eventName, data);
+      }
     }
     // Google Analytics 4
     if ((window as any).gtag) {
@@ -12,7 +16,7 @@ export const trackEvent = (eventName: string, data?: any) => {
       if (eventName === 'ViewContent') gaEventName = 'view_item';
       if (eventName === 'AddToCart') gaEventName = 'add_to_cart';
       
-      const gaData = {
+      const gaData: any = {
          value: data?.value || 89.00,
          currency: data?.currency || 'EUR',
          items: [{
@@ -22,6 +26,10 @@ export const trackEvent = (eventName: string, data?: any) => {
            quantity: data?.num_items || 1
          }]
       };
+
+      if (data?.event_id && eventName === 'Purchase') {
+        gaData.transaction_id = data.event_id;
+      }
 
       (window as any).gtag('event', gaEventName, gaData);
     }

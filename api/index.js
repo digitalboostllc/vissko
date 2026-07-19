@@ -188,11 +188,12 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
                 {
                   event_name: 'Purchase',
                   event_time: Math.floor(Date.now() / 1000),
+                  event_id: session.id,
                   action_source: 'website',
                   user_data: userData,
                   custom_data: {
                     currency: 'EUR',
-                    value: 89.00
+                    value: session.amount_total ? session.amount_total / 100 : 89.00
                   }
                 }
               ],
@@ -423,7 +424,49 @@ app.post('/api/one-click-upsell', async (req, res) => {
         }
       }
 
-      // 3. Trigger AliExpress
+      // 3. Send Facebook CAPI Purchase Event for Upsell
+      try {
+        const pixelId = await getSetting('FB_PIXEL_ID');
+        const accessToken = await getSetting('FB_ACCESS_TOKEN');
+        const clientIp = metadata.client_ip_address || null;
+        const clientUserAgent = metadata.client_user_agent || null;
+        
+        if (pixelId && accessToken && customerEmail) {
+          const hashEmail = crypto.createHash('sha256').update(customerEmail.toLowerCase().trim()).digest('hex');
+          const userData = { em: [hashEmail] };
+          if (phone) {
+             const hashPhone = crypto.createHash('sha256').update(phone.replace(/\D/g,'')).digest('hex');
+             userData.ph = [hashPhone];
+          }
+          if (fbc) userData.fbc = fbc;
+          if (fbp) userData.fbp = fbp;
+          if (clientIp) userData.client_ip_address = clientIp;
+          if (clientUserAgent) userData.client_user_agent = clientUserAgent;
+
+          await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              data: [
+                {
+                  event_name: 'Purchase',
+                  event_time: Math.floor(Date.now() / 1000),
+                  event_id: paymentIntent.id,
+                  action_source: 'website',
+                  user_data: userData,
+                  custom_data: { currency: 'EUR', value: 53.40 }
+                }
+              ],
+              access_token: accessToken
+            })
+          });
+          console.log(`🎯 Server-side Upsell Purchase event sent for ${shortId}`);
+        }
+      } catch (err) {
+        console.error('Error sending Upsell CAPI event:', err);
+      }
+
+      // 4. Trigger AliExpress
       if (shippingAddress) {
         const aeResult = await placeAliExpressOrder(shortId, shippingAddress, customerName, phone, 1);
         if (!aeResult.success) {
@@ -615,7 +658,8 @@ app.get('/session-status', async (req, res) => {
     res.send({
       status: session.status,
       customer_email: session.customer_details?.email,
-      order_id: shortId
+      order_id: shortId,
+      amount_total: session.amount_total ? session.amount_total / 100 : 89.00
     });
   } catch (error) {
     console.error('Error fetching session:', error);

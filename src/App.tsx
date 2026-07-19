@@ -148,7 +148,6 @@ function App() {
     // Check if we are returning from Stripe checkout
     if (window.location.pathname === '/return') {
       setCurrentView('success')
-      trackEvent('Purchase', { value: 89.00, currency: 'EUR' })
     } else if (window.location.pathname === '/admin') {
       setCurrentView('admin')
     }
