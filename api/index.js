@@ -21,6 +21,9 @@ import rateLimit from 'express-rate-limit';
 
 const app = express();
 
+// Trust Vercel proxy for rate limiter and client IPs
+app.set('trust proxy', 1);
+
 // 1. Security Headers
 app.use(helmet());
 
@@ -28,7 +31,8 @@ app.use(helmet());
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:4242',
-  process.env.DOMAIN || 'https://vissko.us'
+  process.env.DOMAIN || 'https://vissko.us',
+  'https://www.vissko.us'
 ];
 app.use(cors({
   origin: function (origin, callback) {
