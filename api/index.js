@@ -44,10 +44,6 @@ app.use(express.static('public'));
 
 // 3. Admin Authentication Middleware
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-if (!ADMIN_PASSWORD && process.env.NODE_ENV === 'production') {
-  console.error("CRITICAL: ADMIN_PASSWORD is not set in production. Security risk!");
-  process.exit(1);
-}
 
 const requireAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization;
