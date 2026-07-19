@@ -267,7 +267,7 @@ export const AdminPage = () => {
           </div>
           
           <div className="text-center">
-            <h1 className="text-xl font-bold mb-2">Accès Administrateur</h1>
+            <h1 className="text-xl font-semibold mb-2">Accès Administrateur</h1>
             <p className="text-sm text-zinc-500">Veuillez entrer le mot de passe pour accéder au tableau de bord.</p>
           </div>
 
@@ -284,7 +284,7 @@ export const AdminPage = () => {
             <button
               type="submit"
               disabled={isLoading || !password}
-              className="w-full bg-black text-white font-bold py-3 px-4 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center"
+              className="w-full bg-black text-white font-medium py-3 px-4 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center"
             >
               {isLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : 'Connexion'}
             </button>
@@ -314,18 +314,18 @@ export const AdminPage = () => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Logo className="h-5 w-auto text-zinc-900" />
-                <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest border-l border-zinc-200 pl-2">Admin</span>
+                <span className="text-sm font-medium text-zinc-400 uppercase tracking-widest border-l border-zinc-200 pl-2">Admin</span>
               </div>
               <nav className="hidden sm:flex items-center gap-4 border-l border-zinc-200 pl-6">
                 <button 
                   onClick={() => setActiveTab('orders')}
-                  className={`text-sm font-bold transition-colors ${activeTab === 'orders' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
+                  className={`text-sm font-medium transition-colors ${activeTab === 'orders' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
                 >
                   Commandes
                 </button>
                 <button 
                   onClick={() => setActiveTab('settings')}
-                  className={`text-sm font-bold transition-colors ${activeTab === 'settings' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
+                  className={`text-sm font-medium transition-colors ${activeTab === 'settings' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
                 >
                   Paramètres
                 </button>
@@ -335,7 +335,7 @@ export const AdminPage = () => {
           <div className="flex items-center gap-3">
             <button 
               onClick={exportToCSV}
-              className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-emerald-700 transition-colors"
+              className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-emerald-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Export CSV</span>
@@ -356,7 +356,7 @@ export const AdminPage = () => {
         {activeTab === 'settings' ? (
           <div className="w-full">
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-zinc-900 mb-1">Paramètres de l'Application</h2>
+              <h2 className="text-2xl font-semibold text-zinc-900 mb-1">Paramètres de l'Application</h2>
               <p className="text-sm text-zinc-500">Gérez vos intégrations et clés d'API dans un espace sécurisé.</p>
             </div>
             
@@ -368,7 +368,7 @@ export const AdminPage = () => {
                   <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-widest mb-6">Marketing & Tracking</h3>
                   <div className="space-y-5">
                     <div>
-                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Facebook Pixel ID</label>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Facebook Pixel ID</label>
                       <input
                         type="text"
                         value={settings.FB_PIXEL_ID}
@@ -378,7 +378,7 @@ export const AdminPage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Meta CAPI Token</label>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Meta CAPI Token</label>
                       <input
                         type="password"
                         value={settings.FB_ACCESS_TOKEN}
@@ -388,7 +388,7 @@ export const AdminPage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Google Analytics (GA4) ID</label>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Google Analytics (GA4) ID</label>
                       <input
                         type="text"
                         value={settings.GTM_ID}
@@ -408,7 +408,7 @@ export const AdminPage = () => {
                   <div className="space-y-5">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">App Key</label>
+                        <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">App Key</label>
                         <input
                           type="text"
                           value={settings.ALIEXPRESS_APP_KEY}
@@ -418,7 +418,7 @@ export const AdminPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">App Secret</label>
+                        <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">App Secret</label>
                         <input
                           type="password"
                           value={settings.ALIEXPRESS_APP_SECRET}
@@ -429,7 +429,7 @@ export const AdminPage = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Access Token</label>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Access Token</label>
                       <input
                         type="password"
                         value={settings.ALIEXPRESS_ACCESS_TOKEN}
@@ -440,7 +440,7 @@ export const AdminPage = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Product ID</label>
+                        <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Product ID</label>
                         <input
                           type="text"
                           value={settings.ALIEXPRESS_PRODUCT_ID}
@@ -450,7 +450,7 @@ export const AdminPage = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">SKU ID (Optional)</label>
+                        <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">SKU ID (Optional)</label>
                         <input
                           type="text"
                           value={settings.ALIEXPRESS_SKU_ID}
@@ -469,7 +469,7 @@ export const AdminPage = () => {
                 <button
                   type="submit"
                   disabled={isSavingSettings}
-                  className="bg-black text-white text-[11px] uppercase tracking-widest font-bold py-3.5 px-8 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center"
+                  className="bg-black text-white text-[11px] uppercase tracking-widest font-medium py-3.5 px-8 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center"
                 >
                   {isSavingSettings ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                   {isSavingSettings ? 'Sauvegarde en cours...' : 'Sauvegarder les paramètres'}
@@ -481,13 +481,13 @@ export const AdminPage = () => {
           <>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-zinc-900 mb-1">Tableau de bord</h2>
+                <h2 className="text-2xl font-semibold text-zinc-900 mb-1">Tableau de bord</h2>
                 <p className="text-sm text-zinc-500">Vue d'ensemble et gestion des expéditions.</p>
               </div>
               <div className="flex items-center gap-3">
             <div className="bg-white px-4 py-3 rounded border border-zinc-200 flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="text-sm font-bold text-zinc-900">{orders.length} Commandes</span>
+              <span className="text-sm font-medium text-zinc-900">{orders.length} Commandes</span>
             </div>
           </div>
         </div>
@@ -496,17 +496,17 @@ export const AdminPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
           <div className="bg-white p-6 rounded border border-zinc-200">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-zinc-500 uppercase">Revenu Total</h3>
+              <h3 className="text-sm font-medium text-zinc-500 uppercase">Revenu Total</h3>
               <Euro className="w-5 h-5 text-zinc-400" />
             </div>
-            <div className="text-3xl font-black text-zinc-900">{totalRevenue.toLocaleString('fr-FR')} €</div>
+            <div className="text-3xl font-semibold text-zinc-900">{totalRevenue.toLocaleString('fr-FR')} €</div>
           </div>
           <div className="bg-white p-6 rounded border border-zinc-200">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-zinc-500 uppercase">Commandes (Aujourd'hui)</h3>
+              <h3 className="text-sm font-medium text-zinc-500 uppercase">Commandes (Aujourd'hui)</h3>
               <Package className="w-5 h-5 text-zinc-400" />
             </div>
-            <div className="text-3xl font-black text-zinc-900">{ordersToday}</div>
+            <div className="text-3xl font-semibold text-zinc-900">{ordersToday}</div>
           </div>
         </div>
 
@@ -535,7 +535,7 @@ export const AdminPage = () => {
                       <td className="px-4 py-3 font-mono text-sm font-medium text-zinc-900">
                         {order.id.replace('VSK-', '')}
                         {order.utm_source && (
-                          <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 uppercase tracking-wider">
+                          <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-800 uppercase tracking-wider">
                             {order.utm_source}
                           </span>
                         )}
@@ -583,14 +583,14 @@ export const AdminPage = () => {
                             {order.stripe_pi_id && (
                               <button
                                 onClick={() => setRefundModal({ isOpen: true, orderId: order.id, piId: order.stripe_pi_id })}
-                                className="inline-flex items-center px-3 py-1.5 bg-white text-zinc-900 text-[11px] uppercase tracking-widest font-bold rounded border border-zinc-200 hover:bg-zinc-50 transition-colors"
+                                className="inline-flex items-center px-3 py-1.5 bg-white text-zinc-900 text-[11px] uppercase tracking-widest font-medium rounded border border-zinc-200 hover:bg-zinc-50 transition-colors"
                               >
                                 Rembourser
                               </button>
                             )}
                             <button
                               onClick={() => setShippingModal({ isOpen: true, orderId: order.id, email: order.email })}
-                              className="inline-flex items-center px-3 py-1.5 bg-black text-white text-[11px] uppercase tracking-widest font-bold rounded hover:bg-zinc-800 transition-colors"
+                              className="inline-flex items-center px-3 py-1.5 bg-black text-white text-[11px] uppercase tracking-widest font-medium rounded hover:bg-zinc-800 transition-colors"
                             >
                               <Package className="w-3.5 h-3.5 mr-1.5" />
                               Expédier
@@ -624,14 +624,14 @@ export const AdminPage = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
           <div className="bg-white rounded border border-zinc-200 p-6 max-w-md w-full flex flex-col gap-6">
             <div>
-              <h3 className="text-xl font-bold mb-2">Expédier la commande {shippingModal.orderId}</h3>
+              <h3 className="text-xl font-semibold mb-2">Expédier la commande {shippingModal.orderId}</h3>
               <p className="text-sm text-zinc-500">
                 Cela marquera la commande comme expédiée et enverra un email automatique au client.
               </p>
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-zinc-900">Lien de suivi (Optionnel)</label>
+              <label className="text-sm font-medium text-zinc-900">Lien de suivi (Optionnel)</label>
               <input
                 type="url"
                 value={trackingUrl}
@@ -644,14 +644,14 @@ export const AdminPage = () => {
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => setShippingModal({ isOpen: false, orderId: null, email: null })}
-                className="px-4 py-2 text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleShipping}
                 disabled={isShipping}
-                className="bg-emerald-600 text-white px-6 py-2 rounded text-sm font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center"
+                className="bg-emerald-600 text-white px-6 py-2 rounded text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center"
               >
                 {isShipping ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Confirmer l'expédition
@@ -666,7 +666,7 @@ export const AdminPage = () => {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded border border-zinc-200 p-6 max-w-md w-full flex flex-col gap-6">
             <div>
-              <h3 className="text-xl font-bold text-red-600 mb-2">Rembourser la commande</h3>
+              <h3 className="text-xl font-semibold text-red-600 mb-2">Rembourser la commande</h3>
               <p className="text-sm text-zinc-500">
                 Êtes-vous sûr de vouloir rembourser la commande {refundModal.orderId} ? Cette action est irréversible et l'argent sera renvoyé sur le compte du client.
               </p>
@@ -675,14 +675,14 @@ export const AdminPage = () => {
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => setRefundModal({ isOpen: false, orderId: null, piId: null })}
-                className="px-4 py-2 text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleRefund}
                 disabled={isRefunding}
-                className="bg-red-600 text-white px-6 py-2 rounded text-sm font-bold hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center"
+                className="bg-red-600 text-white px-6 py-2 rounded text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center"
               >
                 {isRefunding ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
                 Confirmer le remboursement
