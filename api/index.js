@@ -359,6 +359,65 @@ app.post('/api/one-click-upsell', async (req, res) => {
       description: 'Vissko Ventilateur Portable (Upsell -40%)'
     });
 
+    if (paymentIntent.status === 'succeeded') {
+      const shortId = 'VSK-UP-' + paymentIntent.id.slice(-6).toUpperCase();
+      const customerEmail = session.customer_details?.email;
+      const customerName = session.customer_details?.name || session.shipping_details?.name || null;
+      const phone = session.customer_details?.phone || null;
+      const shippingAddress = session.shipping_details?.address || null;
+      
+      const metadata = typeof session.payment_intent === 'object' && session.payment_intent?.metadata ? session.payment_intent.metadata : session.metadata || {};
+      const utmSource = metadata.utm_source || null;
+      const utmMedium = metadata.utm_medium || null;
+      const utmCampaign = metadata.utm_campaign || null;
+      const fbc = metadata.fbc || null;
+      const fbp = metadata.fbp || null;
+
+      // 1. Save to DB
+      try {
+        await saveOrder(shortId, customerEmail, customerName, phone, shippingAddress, paymentIntent.id, utmSource, utmMedium, utmCampaign, fbc, fbp, 53.40);
+        console.log(`✅ Upsell Order ${shortId} saved to database`);
+      } catch (err) {
+        console.error('Error saving upsell to DB:', err);
+      }
+
+      // 2. Send Upsell Confirmation Email
+      if (customerEmail) {
+        try {
+          await resend.emails.send({
+            from: 'Vissko <orders@vissko.us>',
+            to: customerEmail,
+            subject: 'Confirmation de votre ventilateur supplémentaire Vissko',
+            html: `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-w-xl; margin: auto; padding: 40px 20px; background-color: #ffffff; color: #18181b;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <img src="https://vissko.us/assets/logo.png" alt="Vissko Logo" style="height: 32px; width: auto; margin: 0 auto;" />
+                </div>
+                <div style="background-color: #fafafa; border: 1px solid #e4e4e7; border-radius: 24px; padding: 40px 30px; text-align: center;">
+                  <h2 style="margin-top: 0; font-size: 24px; font-weight: 800; color: #18181b;">Ventilateur ajouté !</h2>
+                  <p style="color: #52525b; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                    Merci ! Votre ventilateur supplémentaire à -40% a bien été ajouté. Il sera expédié à la même adresse que votre commande initiale.
+                  </p>
+                  <div style="background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 16px; padding: 20px; margin-bottom: 30px; display: inline-block; text-align: center; min-width: 200px;">
+                    <p style="margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #71717a; font-weight: 600;">Numéro de commande Upsell</p>
+                    <p style="margin: 8px 0 0 0; font-size: 20px; font-weight: 800; color: #10b981;">${shortId}</p>
+                  </div>
+                </div>
+              </div>
+            `
+          });
+        } catch(err) {
+          console.error('Error sending upsell email:', err);
+        }
+      }
+
+      // 3. Trigger AliExpress
+      if (shippingAddress) {
+        placeAliExpressOrder(shortId, shippingAddress, customerName, phone, 1)
+          .catch(err => console.error('AliExpress Upsell Fulfillment Error:', err));
+      }
+    }
+
     res.send({ success: true, paymentIntent });
   } catch (error) {
     console.error('Error creating 1-click upsell:', error);
