@@ -354,109 +354,127 @@ export const AdminPage = () => {
       {/* Main Content */}
       <main className="container mx-auto p-6 flex flex-col gap-6">
         {activeTab === 'settings' ? (
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold text-zinc-900 mb-1">Paramètres de Tracking</h2>
-            <p className="text-sm text-zinc-500 mb-8">Configurez vos pixels et clés d'API sans toucher au code.</p>
+          <div className="w-full">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-zinc-900 mb-1">Paramètres de l'Application</h2>
+              <p className="text-sm text-zinc-500">Gérez vos intégrations et clés d'API dans un espace sécurisé.</p>
+            </div>
             
-            <form onSubmit={handleSaveSettings} className="bg-white p-6 rounded border border-zinc-200 flex flex-col gap-6">
-              <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-1">Facebook Pixel ID</label>
-                <input
-                  type="text"
-                  value={settings.FB_PIXEL_ID}
-                  onChange={(e) => setSettings({...settings, FB_PIXEL_ID: e.target.value})}
-                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                  placeholder="e.g. 1387799923415060"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-1">Facebook Conversions API Token</label>
-                <input
-                  type="password"
-                  value={settings.FB_ACCESS_TOKEN}
-                  onChange={(e) => setSettings({...settings, FB_ACCESS_TOKEN: e.target.value})}
-                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                  placeholder="EAAL..."
-                />
-              </div>
-              <hr className="border-zinc-100" />
-              <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-1">Google Analytics (GA4) ID</label>
-                <input
-                  type="text"
-                  value={settings.GTM_ID}
-                  onChange={(e) => setSettings({...settings, GTM_ID: e.target.value})}
-                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                  placeholder="e.g. G-RHM7G3ZCPG"
-                />
-              </div>
-
-              <hr className="border-zinc-100" />
-              <h3 className="text-lg font-bold text-zinc-900 mb-2 mt-4">AliExpress Dropshipping API</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSaveSettings} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Marketing & Tracking Bento */}
+              <div className="bg-white p-6 rounded border border-zinc-200 flex flex-col gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-zinc-900 mb-1">App Key</label>
-                  <input
-                    type="text"
-                    value={settings.ALIEXPRESS_APP_KEY}
-                    onChange={(e) => setSettings({...settings, ALIEXPRESS_APP_KEY: e.target.value})}
-                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                    placeholder="App Key"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-zinc-900 mb-1">App Secret</label>
-                  <input
-                    type="password"
-                    value={settings.ALIEXPRESS_APP_SECRET}
-                    onChange={(e) => setSettings({...settings, ALIEXPRESS_APP_SECRET: e.target.value})}
-                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                    placeholder="App Secret"
-                  />
+                  <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-widest mb-6">Marketing & Tracking</h3>
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Facebook Pixel ID</label>
+                      <input
+                        type="text"
+                        value={settings.FB_PIXEL_ID}
+                        onChange={(e) => setSettings({...settings, FB_PIXEL_ID: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="e.g. 1387799923415060"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Meta CAPI Token</label>
+                      <input
+                        type="password"
+                        value={settings.FB_ACCESS_TOKEN}
+                        onChange={(e) => setSettings({...settings, FB_ACCESS_TOKEN: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="EAAL..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Google Analytics (GA4) ID</label>
+                      <input
+                        type="text"
+                        value={settings.GTM_ID}
+                        onChange={(e) => setSettings({...settings, GTM_ID: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="e.g. G-RHM7G3ZCPG"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-1">Access Token</label>
-                <input
-                  type="password"
-                  value={settings.ALIEXPRESS_ACCESS_TOKEN}
-                  onChange={(e) => setSettings({...settings, ALIEXPRESS_ACCESS_TOKEN: e.target.value})}
-                  className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                  placeholder="Paste your 30-day AliExpress Access Token here"
-                />
+              {/* AliExpress Bento */}
+              <div className="bg-white p-6 rounded border border-zinc-200 flex flex-col gap-6">
+                <div>
+                  <h3 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-widest mb-6">AliExpress Dropshipping API</h3>
+                  <div className="space-y-5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">App Key</label>
+                        <input
+                          type="text"
+                          value={settings.ALIEXPRESS_APP_KEY}
+                          onChange={(e) => setSettings({...settings, ALIEXPRESS_APP_KEY: e.target.value})}
+                          className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                          placeholder="App Key"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">App Secret</label>
+                        <input
+                          type="password"
+                          value={settings.ALIEXPRESS_APP_SECRET}
+                          onChange={(e) => setSettings({...settings, ALIEXPRESS_APP_SECRET: e.target.value})}
+                          className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                          placeholder="App Secret"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Access Token</label>
+                      <input
+                        type="password"
+                        value={settings.ALIEXPRESS_ACCESS_TOKEN}
+                        onChange={(e) => setSettings({...settings, ALIEXPRESS_ACCESS_TOKEN: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="Paste your 30-day AliExpress Access Token here"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">Product ID</label>
+                        <input
+                          type="text"
+                          value={settings.ALIEXPRESS_PRODUCT_ID}
+                          onChange={(e) => setSettings({...settings, ALIEXPRESS_PRODUCT_ID: e.target.value})}
+                          className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                          placeholder="e.g. 100500..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-zinc-900 uppercase tracking-widest mb-1.5">SKU ID (Optional)</label>
+                        <input
+                          type="text"
+                          value={settings.ALIEXPRESS_SKU_ID}
+                          onChange={(e) => setSettings({...settings, ALIEXPRESS_SKU_ID: e.target.value})}
+                          className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                          placeholder="e.g. 14:193;380..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-bold text-zinc-900 mb-1">Product ID</label>
-                  <input
-                    type="text"
-                    value={settings.ALIEXPRESS_PRODUCT_ID}
-                    onChange={(e) => setSettings({...settings, ALIEXPRESS_PRODUCT_ID: e.target.value})}
-                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                    placeholder="e.g. 100500..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-zinc-900 mb-1">SKU ID (Optional)</label>
-                  <input
-                    type="text"
-                    value={settings.ALIEXPRESS_SKU_ID}
-                    onChange={(e) => setSettings({...settings, ALIEXPRESS_SKU_ID: e.target.value})}
-                    className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm"
-                    placeholder="e.g. 14:193;380:201441007"
-                  />
-                </div>
+              {/* Save Button spanning full width */}
+              <div className="lg:col-span-2 flex justify-end mt-2">
+                <button
+                  type="submit"
+                  disabled={isSavingSettings}
+                  className="bg-black text-white text-[11px] uppercase tracking-widest font-bold py-3.5 px-8 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center"
+                >
+                  {isSavingSettings ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+                  {isSavingSettings ? 'Sauvegarde en cours...' : 'Sauvegarder les paramètres'}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={isSavingSettings}
-                className="bg-black text-white font-bold py-3 px-4 rounded hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center mt-2"
-              >
-                {isSavingSettings ? <RefreshCw className="w-5 h-5 animate-spin" /> : 'Sauvegarder'}
-              </button>
             </form>
           </div>
         ) : (
@@ -497,13 +515,13 @@ export const AdminPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-zinc-50 border-b border-zinc-200">
-                  <th className="px-4 py-3 text-xs font-bold text-zinc-500 uppercase">ID</th>
-                  <th className="px-4 py-3 text-xs font-bold text-zinc-500 uppercase">Date</th>
-                  <th className="px-4 py-3 text-xs font-bold text-zinc-500 uppercase">Client</th>
-                  <th className="px-4 py-3 text-xs font-bold text-zinc-500 uppercase hidden md:table-cell">Contact</th>
-                  <th className="px-4 py-3 text-xs font-bold text-zinc-500 uppercase">Statut</th>
-                  <th className="px-4 py-3 text-xs font-bold text-zinc-500 uppercase text-right">Action</th>
+                <tr className="bg-white border-b border-zinc-100">
+                  <th className="px-4 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-widest">ID</th>
+                  <th className="px-4 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-widest">Date</th>
+                  <th className="px-4 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-widest">Client</th>
+                  <th className="px-4 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-widest hidden md:table-cell">Contact</th>
+                  <th className="px-4 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-widest">Statut</th>
+                  <th className="px-4 py-4 text-[11px] font-semibold text-zinc-400 uppercase tracking-widest text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
@@ -513,7 +531,7 @@ export const AdminPage = () => {
                   })
                   
                   return (
-                    <tr key={order.id} className="hover:bg-zinc-50 transition-colors">
+                    <tr key={order.id} className="hover:bg-zinc-50 transition-colors border-b border-zinc-100 last:border-0">
                       <td className="px-4 py-3 font-mono text-sm font-medium text-zinc-900">
                         {order.id.replace('VSK-', '')}
                         {order.utm_source && (
@@ -535,44 +553,48 @@ export const AdminPage = () => {
                       </td>
                       <td className="px-4 py-3">
                         {order.status === 'confirmed' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
-                            Confirmé
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                            <span className="text-[13px] font-medium text-zinc-900">Confirmé</span>
+                          </div>
                         )}
                         {order.status === 'shipped' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                            Expédié
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                            <span className="text-[13px] font-medium text-zinc-900">Expédié</span>
+                          </div>
                         )}
                         {order.status === 'refunded' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
-                            Remboursé
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-400"></div>
+                            <span className="text-[13px] font-medium text-zinc-500">Remboursé</span>
+                          </div>
                         )}
                         {order.status === 'disputed' && (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-rose-600 text-white shadow-sm animate-pulse">
-                            Litige (Disputed)
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></div>
+                            <span className="text-[13px] font-medium text-rose-600">Litige (Disputed)</span>
+                          </div>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
                         {order.status === 'confirmed' && (
                           <div className="flex justify-end gap-2">
-                            <button
-                              onClick={() => setShippingModal({ isOpen: true, orderId: order.id, email: order.email })}
-                              className="inline-flex items-center px-3 py-1.5 bg-zinc-900 text-white text-xs font-medium rounded hover:bg-zinc-800 transition-colors"
-                            >
-                              <Package className="w-3.5 h-3.5 mr-1.5" />
-                              Expédier
-                            </button>
                             {order.stripe_pi_id && (
                               <button
                                 onClick={() => setRefundModal({ isOpen: true, orderId: order.id, piId: order.stripe_pi_id })}
-                                className="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-xs font-medium rounded border border-red-200 hover:bg-red-100 transition-colors"
+                                className="inline-flex items-center px-3 py-1.5 bg-white text-zinc-900 text-[11px] uppercase tracking-widest font-bold rounded border border-zinc-200 hover:bg-zinc-50 transition-colors"
                               >
                                 Rembourser
                               </button>
                             )}
+                            <button
+                              onClick={() => setShippingModal({ isOpen: true, orderId: order.id, email: order.email })}
+                              className="inline-flex items-center px-3 py-1.5 bg-black text-white text-[11px] uppercase tracking-widest font-bold rounded hover:bg-zinc-800 transition-colors"
+                            >
+                              <Package className="w-3.5 h-3.5 mr-1.5" />
+                              Expédier
+                            </button>
                           </div>
                         )}
                         {(order.status === 'shipped' || order.status === 'refunded' || order.status === 'disputed') && (
