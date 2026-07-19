@@ -163,10 +163,10 @@ export const AdminPage = () => {
         setShippingModal({ isOpen: false, orderId: null, email: null })
         setTrackingUrl('')
       } else {
-        alert('Erreur lors de la mise à jour')
+        console.error('Erreur lors de la mise à jour')
       }
     } catch (err) {
-      alert('Erreur réseau')
+      console.error('Erreur réseau', err)
     } finally {
       setIsShipping(false)
     }
@@ -195,10 +195,10 @@ export const AdminPage = () => {
         setRefundModal({ isOpen: false, orderId: null, piId: null })
       } else {
         const data = await response.json()
-        alert(data.error || 'Erreur lors du remboursement')
+        console.error(data.error || 'Erreur lors du remboursement')
       }
     } catch (err) {
-      alert('Erreur réseau')
+      console.error('Erreur réseau', err)
     } finally {
       setIsRefunding(false)
     }
@@ -217,12 +217,12 @@ export const AdminPage = () => {
         body: JSON.stringify(settings)
       })
       if (response.ok) {
-        alert('Paramètres sauvegardés avec succès !')
+        console.log('Paramètres sauvegardés avec succès !')
       } else {
-        alert('Erreur lors de la sauvegarde.')
+        console.error('Erreur lors de la sauvegarde.')
       }
     } catch (err) {
-      alert('Erreur réseau.')
+      console.error('Erreur réseau.', err)
     } finally {
       setIsSavingSettings(false)
     }

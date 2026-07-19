@@ -40,11 +40,11 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
         trackEvent('Purchase', { value: 53.40, currency: 'EUR', event_id: sessionId + '_upsell' })
       } else {
         console.error('Upsell failed:', data.error)
-        alert('Impossible de traiter la demande avec le moyen de paiement enregistré.')
+        setError('Impossible de traiter la demande avec le moyen de paiement enregistré.')
       }
     } catch (error) {
       console.error('Upsell error:', error)
-      alert('Une erreur est survenue.')
+      setError('Une erreur est survenue.')
     } finally {
       setIsUpsellLoading(false)
     }
