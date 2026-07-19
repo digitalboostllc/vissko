@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Download, Lock, RefreshCw, LogOut, Package, Euro } from 'lucide-react'
+import { Download, Lock, RefreshCw, LogOut, Package, Euro, TrendingUp, Activity, BarChart3 } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 
 
@@ -30,7 +30,7 @@ export const AdminPage = () => {
   const [isShipping, setIsShipping] = useState(false)
   const [isRefunding, setIsRefunding] = useState(false)
   
-  const [activeTab, setActiveTab] = useState<'orders' | 'settings'>('orders')
+  const [activeTab, setActiveTab] = useState<'orders' | 'settings' | 'analytics'>('orders')
   const [settings, setSettings] = useState({ 
     FB_PIXEL_ID: '', 
     FB_ACCESS_TOKEN: '', 
@@ -40,9 +40,36 @@ export const AdminPage = () => {
     ALIEXPRESS_ACCESS_TOKEN: '',
     ALIEXPRESS_PRODUCT_ID: '',
     ALIEXPRESS_SKU_ID: '',
-    ADMIN_PASSWORD: ''
+    ADMIN_PASSWORD: '',
+    FB_AD_ACCOUNT_ID: '',
+    UNIT_COGS: '25'
   })
   const [isSavingSettings, setIsSavingSettings] = useState(false)
+
+  const [fbInsights, setFbInsights] = useState<any[]>([])
+  const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(false)
+
+  useEffect(() => {
+    if (activeTab === 'analytics' && isAuthenticated) {
+      fetchAnalytics()
+    }
+  }, [activeTab, isAuthenticated])
+
+  const fetchAnalytics = async () => {
+    setIsAnalyticsLoading(true)
+    try {
+      const token = sessionStorage.getItem('admin_token')
+      const res = await fetch('/api/admin/analytics', { headers: { 'Authorization': `Bearer ${token}` } })
+      if (res.ok) {
+        const data = await res.json()
+        setFbInsights(data.fbInsights || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch analytics', err)
+    } finally {
+      setIsAnalyticsLoading(false)
+    }
+  }
 
   // Check session storage on mount
   useEffect(() => {
@@ -82,7 +109,9 @@ export const AdminPage = () => {
         ALIEXPRESS_ACCESS_TOKEN: settingsData.ALIEXPRESS_ACCESS_TOKEN || '',
         ALIEXPRESS_PRODUCT_ID: settingsData.ALIEXPRESS_PRODUCT_ID || '',
         ALIEXPRESS_SKU_ID: settingsData.ALIEXPRESS_SKU_ID || '',
-        ADMIN_PASSWORD: settingsData.ADMIN_PASSWORD || ''
+        ADMIN_PASSWORD: settingsData.ADMIN_PASSWORD || '',
+        FB_AD_ACCOUNT_ID: settingsData.FB_AD_ACCOUNT_ID || '',
+        UNIT_COGS: settingsData.UNIT_COGS || '25'
       })
       
       setIsAuthenticated(true)
@@ -307,6 +336,12 @@ export const AdminPage = () => {
   const today = new Date().toISOString().split('T')[0];
   const ordersToday = orders.filter(o => o.created_at.startsWith(today)).length;
 
+  const totalAdSpend = fbInsights.reduce((acc, campaign) => acc + parseFloat(campaign.spend || '0'), 0);
+  const totalCogs = orders.filter(o => o.status !== 'refunded').length * parseFloat(settings.UNIT_COGS || '25');
+  const stripeFees = orders.filter(o => o.status !== 'refunded').length * 0.25 + (totalRevenue * 0.015);
+  const netProfit = totalRevenue - totalCogs - totalAdSpend - stripeFees;
+  const roas = totalAdSpend > 0 ? (totalRevenue / totalAdSpend).toFixed(2) : '0.00';
+
   return (
     <div className="min-h-screen bg-zinc-50 pb-20">
       {/* Header */}
@@ -330,6 +365,12 @@ export const AdminPage = () => {
                   className={`text-sm font-medium transition-colors ${activeTab === 'settings' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
                 >
                   Paramètres
+                </button>
+                <button 
+                  onClick={() => setActiveTab('analytics')}
+                  className={`text-sm font-medium transition-colors ${activeTab === 'analytics' ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
+                >
+                  Analytiques
                 </button>
               </nav>
             </div>
@@ -397,6 +438,26 @@ export const AdminPage = () => {
                         onChange={(e) => setSettings({...settings, GTM_ID: e.target.value})}
                         className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
                         placeholder="e.g. G-RHM7G3ZCPG"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Facebook Ad Account ID</label>
+                      <input
+                        type="text"
+                        value={settings.FB_AD_ACCOUNT_ID}
+                        onChange={(e) => setSettings({...settings, FB_AD_ACCOUNT_ID: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="e.g. act_123456789"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Cost of Goods Sold (COGS) in EUR</label>
+                      <input
+                        type="text"
+                        value={settings.UNIT_COGS}
+                        onChange={(e) => setSettings({...settings, UNIT_COGS: e.target.value})}
+                        className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                        placeholder="e.g. 25.00"
                       />
                     </div>
                   </div>
@@ -637,6 +698,106 @@ export const AdminPage = () => {
           </div>
         </div>
         </>
+        )}
+
+        {activeTab === 'analytics' && (
+          <div className="w-full flex flex-col gap-6">
+            <div className="mb-2">
+              <h2 className="text-2xl font-semibold text-zinc-900 mb-1">Financial Analytics</h2>
+              <p className="text-sm text-zinc-500">Real-time P&L matched with Facebook Ad spend.</p>
+            </div>
+
+            {isAnalyticsLoading ? (
+              <div className="flex justify-center p-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-zinc-900" />
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div className="bg-white p-5 rounded-2xl border border-zinc-200">
+                    <div className="flex items-center gap-2 text-zinc-500 mb-2">
+                      <Euro className="w-4 h-4" />
+                      <span className="text-xs font-semibold uppercase tracking-wider">Gross Revenue</span>
+                    </div>
+                    <div className="text-2xl font-bold">{totalRevenue.toFixed(2)} €</div>
+                  </div>
+                  
+                  <div className="bg-white p-5 rounded-2xl border border-zinc-200">
+                    <div className="flex items-center gap-2 text-rose-500 mb-2">
+                      <TrendingUp className="w-4 h-4" />
+                      <span className="text-xs font-semibold uppercase tracking-wider">Ad Spend</span>
+                    </div>
+                    <div className="text-2xl font-bold text-rose-600">-{totalAdSpend.toFixed(2)} €</div>
+                  </div>
+
+                  <div className="bg-white p-5 rounded-2xl border border-zinc-200">
+                    <div className="flex items-center gap-2 text-rose-500 mb-2">
+                      <Package className="w-4 h-4" />
+                      <span className="text-xs font-semibold uppercase tracking-wider">COGS</span>
+                    </div>
+                    <div className="text-2xl font-bold text-rose-600">-{totalCogs.toFixed(2)} €</div>
+                  </div>
+
+                  <div className="bg-white p-5 rounded-2xl border border-zinc-200">
+                    <div className="flex items-center gap-2 text-rose-500 mb-2">
+                      <Activity className="w-4 h-4" />
+                      <span className="text-xs font-semibold uppercase tracking-wider">Stripe Fees</span>
+                    </div>
+                    <div className="text-2xl font-bold text-rose-600">-{stripeFees.toFixed(2)} €</div>
+                  </div>
+
+                  <div className="bg-zinc-900 text-white p-5 rounded-2xl border border-zinc-800 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                      <BarChart3 className="w-16 h-16" />
+                    </div>
+                    <div className="flex items-center gap-2 text-emerald-400 mb-2 relative z-10">
+                      <Euro className="w-4 h-4" />
+                      <span className="text-xs font-semibold uppercase tracking-wider">Net Profit</span>
+                    </div>
+                    <div className="text-3xl font-black text-emerald-400 relative z-10">{netProfit.toFixed(2)} €</div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded border border-zinc-200 mt-4 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+                    <h3 className="font-semibold text-zinc-900">Facebook Campaigns</h3>
+                    <span className="text-sm font-medium text-zinc-500">Overall ROAS: <span className="text-emerald-600">{roas}x</span></span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-zinc-50/50">
+                          <th className="px-6 py-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest border-b border-zinc-200">Campaign Name</th>
+                          <th className="px-6 py-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest border-b border-zinc-200 text-right">Spend</th>
+                          <th className="px-6 py-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest border-b border-zinc-200 text-right">CPC</th>
+                          <th className="px-6 py-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest border-b border-zinc-200 text-right">CPM</th>
+                          <th className="px-6 py-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest border-b border-zinc-200 text-right">Clicks</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {fbInsights.map((campaign, idx) => (
+                          <tr key={idx} className="hover:bg-zinc-50 transition-colors border-b border-zinc-100 last:border-0">
+                            <td className="px-6 py-4 text-sm font-medium text-zinc-900">{campaign.campaign_name}</td>
+                            <td className="px-6 py-4 text-sm text-zinc-500 text-right">{parseFloat(campaign.spend).toFixed(2)} €</td>
+                            <td className="px-6 py-4 text-sm text-zinc-500 text-right">{parseFloat(campaign.cpc || '0').toFixed(2)} €</td>
+                            <td className="px-6 py-4 text-sm text-zinc-500 text-right">{parseFloat(campaign.cpm || '0').toFixed(2)} €</td>
+                            <td className="px-6 py-4 text-sm text-zinc-500 text-right">{campaign.actions?.find((a: any) => a.action_type === 'link_click')?.value || campaign.outbound_clicks?.[0]?.value || 0}</td>
+                          </tr>
+                        ))}
+                        {fbInsights.length === 0 && (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-8 text-center text-sm text-zinc-500">
+                              Aucune donnée de campagne trouvée. Vérifiez vos identifiants FB.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         )}
       </main>
 

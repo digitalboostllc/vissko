@@ -567,6 +567,32 @@ app.get('/api/admin/orders', adminLimiter, requireAdmin, async (req, res) => {
   }
 });
 
+// Admin Analytics Endpoint
+app.get('/api/admin/analytics', adminLimiter, requireAdmin, async (req, res) => {
+  try {
+    const orders = await getAllOrders();
+    const adAccountId = await getSetting('FB_AD_ACCOUNT_ID');
+    const accessToken = await getSetting('FB_ACCESS_TOKEN');
+
+    let fbInsights = [];
+    if (adAccountId && accessToken) {
+      // Fetch Facebook Ads Insights
+      const fbResponse = await fetch(`https://graph.facebook.com/v19.0/${adAccountId}/insights?level=campaign&fields=campaign_name,spend,actions,outbound_clicks,cpm,cpp,cpc&date_preset=maximum&access_token=${accessToken}`);
+      if (fbResponse.ok) {
+        const fbData = await fbResponse.json();
+        fbInsights = fbData.data || [];
+      } else {
+        console.error('FB API Error:', await fbResponse.text());
+      }
+    }
+
+    res.send({ orders, fbInsights });
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).send({ error: 'Failed to fetch analytics' });
+  }
+});
+
 // Admin Shipping Endpoint
 app.put('/api/admin/orders/:id', adminLimiter, requireAdmin, async (req, res) => {
 
