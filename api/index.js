@@ -230,6 +230,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), async (request, re
     } else {
       console.log(`⚠️ Order ${shortId} saved but payment_status is '${session.payment_status}'. Skipping fulfillment.`);
     }
+    }
   } else if (event.type === 'charge.refunded') {
     const charge = event.data.object;
     const email = charge.billing_details?.email || charge.receipt_email;
