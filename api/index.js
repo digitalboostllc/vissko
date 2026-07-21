@@ -345,6 +345,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
     if (discount === 'SAVE10') {
       sessionParams.discounts = [{ coupon: 'SAVE10' }];
+      delete sessionParams.allow_promotion_codes; // Stripe API forbids using both simultaneously
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
