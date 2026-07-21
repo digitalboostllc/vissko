@@ -77,7 +77,7 @@ const adminLimiter = rateLimit({
 // IMPORTANT: Webhook must use express.raw before express.json()
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-app.post('/webhook', express.raw({type: 'application/json'}), async (request, response) => {
+app.post(['/webhook', '/api/webhook'], express.raw({type: 'application/json'}), async (request, response) => {
   const sig = request.headers['stripe-signature'];
   let event;
 
