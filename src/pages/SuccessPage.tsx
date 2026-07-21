@@ -18,6 +18,7 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isUpsellLoading, setIsUpsellLoading] = useState(false)
   const [upsellSuccess, setUpsellSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleUpsell = async () => {
     setIsUpsellLoading(true)
@@ -175,6 +176,14 @@ export const SuccessPage = ({ onGoHome, onTrackOrder }: SuccessPageProps) => {
                 <span className="line-through text-zinc-400 text-sm">89,00 €</span>
                 <span className="font-black text-2xl text-amber-600">53,40 €</span>
               </div>
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-2 text-left">
+                  <XCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <Button 
                 onClick={handleUpsell}
                 disabled={isUpsellLoading}
