@@ -42,7 +42,9 @@ export const AdminPage = () => {
     ALIEXPRESS_SKU_ID: '',
     ADMIN_PASSWORD: '',
     FB_AD_ACCOUNT_ID: '',
-    UNIT_COGS: '25'
+    UNIT_COGS: '25',
+    TIKTOK_PIXEL_ID: '',
+    SNAPCHAT_PIXEL_ID: ''
   })
   const [isSavingSettings, setIsSavingSettings] = useState(false)
 
@@ -111,7 +113,9 @@ export const AdminPage = () => {
         ALIEXPRESS_SKU_ID: settingsData.ALIEXPRESS_SKU_ID || '',
         ADMIN_PASSWORD: settingsData.ADMIN_PASSWORD || '',
         FB_AD_ACCOUNT_ID: settingsData.FB_AD_ACCOUNT_ID || '',
-        UNIT_COGS: settingsData.UNIT_COGS || '25'
+        UNIT_COGS: settingsData.UNIT_COGS || '25',
+        TIKTOK_PIXEL_ID: settingsData.TIKTOK_PIXEL_ID || '',
+        SNAPCHAT_PIXEL_ID: settingsData.SNAPCHAT_PIXEL_ID || ''
       })
       
       setIsAuthenticated(true)
@@ -439,6 +443,28 @@ export const AdminPage = () => {
                         className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
                         placeholder="e.g. G-RHM7G3ZCPG"
                       />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">TikTok Pixel ID</label>
+                        <input
+                          type="text"
+                          value={settings.TIKTOK_PIXEL_ID}
+                          onChange={(e) => setSettings({...settings, TIKTOK_PIXEL_ID: e.target.value})}
+                          className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                          placeholder="e.g. CEQ..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Snapchat Pixel ID</label>
+                        <input
+                          type="text"
+                          value={settings.SNAPCHAT_PIXEL_ID}
+                          onChange={(e) => setSettings({...settings, SNAPCHAT_PIXEL_ID: e.target.value})}
+                          className="w-full px-4 py-2 border border-zinc-200 rounded focus:outline-none focus:border-black font-mono text-sm transition-colors"
+                          placeholder="e.g. 9812..."
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-medium text-zinc-900 uppercase tracking-widest mb-1.5">Facebook Ad Account ID</label>

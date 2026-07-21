@@ -531,6 +531,8 @@ app.get('/api/settings', async (req, res) => {
     res.send({
       FB_PIXEL_ID: settings.FB_PIXEL_ID || null,
       GTM_ID: settings.GTM_ID || null,
+      TIKTOK_PIXEL_ID: settings.TIKTOK_PIXEL_ID || null,
+      SNAPCHAT_PIXEL_ID: settings.SNAPCHAT_PIXEL_ID || null,
     });
   } catch (err) {
     console.error('Error fetching settings:', err);
